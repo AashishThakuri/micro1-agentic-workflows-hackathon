@@ -1,7 +1,7 @@
 import { sites } from '@openai/sites-vite-plugin';
 import tailwindcss from '@tailwindcss/postcss';
 import vinext from 'vinext';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import hostingConfig from './.openai/hosting.json';
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
@@ -34,7 +34,11 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ mode }) => {
+  // Read server-only local credentials from the backend folder. Vite exposes
+  // only VITE_-prefixed values to browser code; this key remains server-side.
+  const backendEnv = loadEnv(mode, '../backend', '');
+  process.env.GEMINI_API_KEY ??= backendEnv.GEMINI_API_KEY;
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= 'false';
@@ -54,7 +58,12 @@ export default defineConfig(async () => {
       sites(),
       cloudflare({
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
-        config: localBindingConfig,
+        config: {
+          ...localBindingConfig,
+          vars: backendEnv.GEMINI_API_KEY
+            ? { GEMINI_API_KEY: backendEnv.GEMINI_API_KEY }
+            : {},
+        },
       }),
     ],
   };

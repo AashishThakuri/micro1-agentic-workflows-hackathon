@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from "next/link";
 
 export const Button03 = ({ text = "Start Learning" }) => {
   // Define the index patterns for left and right pixels
@@ -6,7 +7,7 @@ export const Button03 = ({ text = "Start Learning" }) => {
   const rightPixelIndices = [3, 0, 0, 0, 4, 0, 0, 2, 1, 3, 0, 0];
 
   return (
-    <a href="#top" className="button03 w-inline-block" aria-label={text}>
+    <Link href="/learn" className="button03 w-inline-block" aria-label={text}>
       <span className="button03_bg">
         <span className="button03_bg-left">
           {leftPixelIndices.map((index, i) => (
@@ -31,6 +32,6 @@ export const Button03 = ({ text = "Start Learning" }) => {
       <span data-text={text} className="button03_inner">
         <span className="button03_text">{text}</span>
       </span>
-    </a>
+    </Link>
   );
 };
