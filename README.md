@@ -28,6 +28,6 @@ Then open `http://localhost:3000`.
 
 The intended workflow is simple: provide learning material, generate a narrated and explorable lesson, ask questions directly in context, and let the lesson update its visuals rather than restarting as a generic chat response.
 
-Ocular's visual direction uses sparse hand-drawn explanations: one cognitive action per scene, original physical metaphors, minimal annotation, and motion only when motion makes a relationship clearer. This direction is informed by the MIT-licensed [Ian Xiaohei Illustrations](https://github.com/helloianneo/ian-xiaohei-illustrations) project; Ocular generates original compositions rather than copying its sample images.
+Ocular's visual direction uses sparse hand-drawn explanations: one cognitive action per scene, original physical metaphors, minimal annotation, and motion only when motion makes a relationship clearer.
 
 This README is intentionally brief while the product is in its foundation stage. Reproduction, evaluation, architecture, and complete product documentation will be added as the working system is built.
