@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
 import { dirname, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
 
 const rootUrl = process.env.OCULAR_URL || "http://localhost:3000";
 const cases = JSON.parse(await readFile(new URL("./cases.json", import.meta.url), "utf8"));
@@ -21,6 +22,13 @@ const outputPath =
   outputFlagIndex >= 0 && process.argv[outputFlagIndex + 1]
     ? resolve(process.cwd(), process.argv[outputFlagIndex + 1])
     : null;
+const codeCommit = (() => {
+  try {
+    return execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  } catch {
+    return null;
+  }
+})();
 
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY is required in the environment or backend/.env.");
@@ -160,6 +168,7 @@ const summary = {
 const artifact = {
   schemaVersion: 1,
   generatedAt: new Date().toISOString(),
+  codeCommit,
   command: outputPath
     ? `node evaluation/run.mjs --output ${process.argv[outputFlagIndex + 1]}`
     : "node evaluation/run.mjs",

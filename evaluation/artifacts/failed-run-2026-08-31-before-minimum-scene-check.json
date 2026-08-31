@@ -1,0 +1,2974 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-31T13:58:43.074Z",
+  "command": "node evaluation/run.mjs --output evaluation/artifacts/run-2026-08-31.json",
+  "environment": {
+    "node": "v22.11.0",
+    "ocularUrl": "http://localhost:3000",
+    "baselineModels": [
+      "gemini-3.1-flash-lite",
+      "gemini-2.5-flash-lite",
+      "gemini-2.5-flash"
+    ]
+  },
+  "rubric": {
+    "primaryMetric": "runnable visual lesson completion",
+    "requiredChecks": [
+      "atLeastTwoScenes",
+      "narration",
+      "visualObjects",
+      "animationTimeline",
+      "directManipulation",
+      "rendererPlan"
+    ]
+  },
+  "summary": {
+    "cases": 10,
+    "baselineRunnable": 0,
+    "ocularRunnable": 9,
+    "baselineKeywordCoveragePercent": 98,
+    "ocularKeywordCoveragePercent": 93,
+    "baselineMedianLatencyMs": 4294,
+    "ocularMedianLatencyMs": 6832,
+    "fallbackCases": []
+  },
+  "results": [
+    {
+      "id": "transfer-learning",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand **Transfer Learning**, imagine you are an expert chef who has spent years learning how to chop, sauté, and season food. Suddenly, you are asked to cook a type of cuisine you’ve never made before (e.g., Ethiopian food). \n\nYou don’t start by learning how to hold a knife or how heat works. You use your **existing culinary foundation** and just learn the new spices and specific recipes. \n\nIn Artificial Intelligence, Transfer Learning is exactly that: taking a model trained on one task and applying it to a new, related task.\n\n---\n\n### The Scenario: From Everyday Objects to Plant Diseases\n\nImagine we have a massive neural network (like ResNet) that has already been trained on millions of images of \"everyday objects\" (cats, cars, chairs, apples). \n\n1.  **The Foundation (The Feature Extractor):** During its initial training, the network learned to recognize \"visual building blocks\": edges, textures, curves, and patterns. It knows what a \"leaf-like\" edge looks like because it saw plants in the original dataset.\n2.  **The New Task:** Now, you want to classify plant diseases (e.g., \"Healthy,\" \"Rust,\" or \"Blight\"). You only have 200 photos of sick leaves—far too few to train a model from scratch.\n3.  **The Reuse:** You take the \"brain\" of the everyday-object model and chop off the very last layer (the one that says \"This is a cat\"). You replace it with a new, tiny layer that says \"This is a disease.\" Because the model already knows how to \"see\" shapes and textures, it only needs to learn how to map those shapes to your specific disease labels.\n\n---\n\n### The Two Strategies: Freezing vs. Fine-Tuning\n\nWhen you plug that old \"brain\" into your new task, you have two ways to handle the training:\n\n#### 1. Freezing (The \"Feature Extractor\" approach)\n*   **What it is:** You lock the weights of the original model so they cannot change. You only train the new, final layer you added.\n*   **When to use it:** When your new dataset is very small or very similar to the original data. \n*   **Pros:** It’s fast and prevents \"overfitting\" (where the model memorizes your tiny dataset instead of learning patterns).\n\n#### 2. Fine-Tuning (The \"Adaptation\" approach)\n*   **What it is:** You keep the original weights, but you \"unfreeze\" them and train the whole network with a very low learning rate. This allows the model to slightly tweak its internal filters to better recognize the specific nuances of plant leaves.\n*   **When to use it:** When you have a bit more data and want to squeeze out higher accuracy.\n*   **Pros:** The model becomes an expert in the new domain, not just a generalist.\n\n---\n\n### When does it help? (The \"Goldilocks\" Zone)\n*   **It helps when:** You have limited data. Without transfer learning, a neural network would need thousands of images to learn what an \"edge\" is. With transfer learning, it starts with that knowledge already installed.\n*   **It helps when:** The tasks are related. A model trained on medical X-rays is great for identifying bone fractures; a model trained on cats is great for identifying general objects.\n\n### When does it fail?\n*   **The \"Domain Gap\":** If the tasks are completely unrelated, transfer learning fails. If you try to use a model trained on \"everyday objects\" to analyze complex satellite weather patterns or highly abstract mathematical graphs, the \"visual building blocks\" (edges and textures) might be useless.\n*   **Negative Transfer:** If the original model learned features that are actually *misleading* for your new task, forcing the model to use those features will result in lower accuracy than if you had just started from scratch.\n\n### Summary\nTransfer learning is the **shortcut to intelligence.** By standing on the shoulders of giants—using models that have already \"seen\" the world—you can build highly accurate tools for specialized problems without needing a massive budget or millions of data points.",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 7111
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 0.75,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 6379,
+        "generation": "agent",
+        "lesson": {
+          "title": "Understanding Transfer Learning",
+          "summary": "An exploration of how neural networks reuse learned visual features to solve new problems with limited data, comparing frozen feature extraction with fine-tuning.",
+          "scenes": [
+            {
+              "title": "The Pretrained Foundation",
+              "objective": "Explain how a network learns general features from a large dataset.",
+              "narration": "Imagine a neural network trained on millions of everyday images. It learns to recognize basic shapes, textures, and patterns. These early layers act as a universal visual dictionary.",
+              "durationSeconds": 12,
+              "visualType": "hierarchy",
+              "visualTitle": "Learned Feature Hierarchy",
+              "visualMetaphor": "A layered pyramid of visual building blocks",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Input Image",
+                  "detail": "Raw pixel data",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "square"
+                },
+                {
+                  "label": "Low Level Features",
+                  "detail": "Edges and curves",
+                  "role": "process",
+                  "accent": "blue",
+                  "symbol": "wave"
+                },
+                {
+                  "label": "High Level Features",
+                  "detail": "Shapes and objects",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "extracts"
+                },
+                {
+                  "from": 1,
+                  "to": 2,
+                  "label": "composes"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "Imagine a neural network"
+                },
+                {
+                  "atPercent": 40,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "It learns to recognize basic shapes"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "reveal",
+                  "narrationCue": "These early layers act as a universal visual dictionary"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "basic shapes textures and patterns"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "patterns These early layers act"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "as a universal visual dictionary"
+                }
+              ],
+              "interaction": {
+                "label": "Layer Depth",
+                "targetIndex": 2,
+                "kind": "slider",
+                "effect": "scale",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 3,
+                "unit": "layers",
+                "lowState": "Simple",
+                "highState": "Complex",
+                "prompt": "Adjust the depth of feature extraction"
+              },
+              "interactionPrompt": "Slide to see how features grow in complexity.",
+              "renderSpec": {
+                "domain": "computing",
+                "engine": "illustration",
+                "template": "concept",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "x",
+                "parameterMin": 0,
+                "parameterMax": 1,
+                "xMin": 0,
+                "xMax": 1,
+                "yMin": 0,
+                "yMax": 1,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Transferring Knowledge",
+              "objective": "Show how features are reused for a new task.",
+              "narration": "Now we take this trained model and apply it to a new task, like identifying plant diseases. We keep the base layers, which already know how to see, and only retrain the final output layer.",
+              "durationSeconds": 12,
+              "visualType": "process",
+              "visualTitle": "Feature Reuse",
+              "visualMetaphor": "A bridge connecting old knowledge to new goals",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Frozen Base",
+                  "detail": "General visual knowledge",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "stack"
+                },
+                {
+                  "label": "New Output Layer",
+                  "detail": "Specific disease classification",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Plant Leaf",
+                  "detail": "Target data",
+                  "role": "context",
+                  "accent": "olive",
+                  "symbol": "tree"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "feeds"
+                },
+                {
+                  "from": 2,
+                  "to": 0,
+                  "label": "input"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "We keep the base layers"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "apply it to a new task"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "connect",
+                  "narrationCue": "only retrain the final output layer"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "We keep the base layers"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "already know how to see"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "only retrain the final output"
+                }
+              ],
+              "interaction": {
+                "label": "Training Mode",
+                "targetIndex": 0,
+                "kind": "toggle",
+                "effect": "intensity",
+                "min": 0,
+                "max": 1,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "mode",
+                "lowState": "Frozen",
+                "highState": "Fine-Tuned",
+                "prompt": "Toggle between freezing and fine-tuning"
+              },
+              "interactionPrompt": "Toggle to see how the base layers react.",
+              "renderSpec": {
+                "domain": "computing",
+                "engine": "illustration",
+                "template": "process",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "x",
+                "parameterMin": 0,
+                "parameterMax": 1,
+                "xMin": 0,
+                "xMax": 1,
+                "yMin": 0,
+                "yMax": 1,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "mitosis",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand mitosis, think of it as a **\"copy-and-paste\"** operation for a cell. The goal is to take one cell and turn it into two identical \"daughter\" cells.\n\nHere is the step-by-step process, broken down into simple terms.\n\n---\n\n### Phase 0: The Setup (Interphase)\nBefore mitosis even begins, the cell must prepare. It **duplicates its DNA**. \n*   **The result:** Each chromosome now consists of two identical halves called **sister chromatids**, joined together in the middle like an \"X.\" Think of this as having two copies of the same instruction manual.\n\n---\n\n### Phase 1: Prophase (The Preparation)\nThe cell gets everything organized.\n*   The DNA coils up tightly so it doesn’t get tangled.\n*   The \"envelope\" holding the DNA (the nucleus) dissolves.\n*   **Spindle fibers** begin to form. Think of these as tiny, invisible ropes or fishing lines that will be used to move the chromosomes around.\n\n### Phase 2: Metaphase (The Middle)\nThis is the \"tug-of-war\" setup.\n*   The spindle fibers attach to the center of each \"X\" (the sister chromatids).\n*   They pull and push the chromosomes until they are all lined up perfectly in a single file line **right down the middle of the cell.**\n\n### Phase 3: Anaphase (The Separation)\nThis is the most important part.\n*   The spindle fibers suddenly shorten and pull hard.\n*   This snaps the \"X\" apart. The two sister chromatids are pulled to opposite sides of the cell.\n*   **Result:** One complete set of DNA is now at the left side, and an identical set is at the right side.\n\n### Phase 4: Telophase (The Cleanup)\nThe cell starts to look like two cells again.\n*   The spindle fibers disappear.\n*   A new protective envelope (nucleus) forms around each of the two new sets of DNA.\n*   The DNA begins to uncoil and relax.\n\n---\n\n### The Final Step: Cytokinesis\nWhile mitosis is the division of the *DNA*, **cytokinesis** is the division of the *rest of the cell* (the jelly-like fluid and parts inside).\n\n*   The cell membrane pinches inward (like a drawstring bag being pulled shut) until it snaps into two separate, independent cells.\n\n---\n\n### Summary Checklist\n1.  **Duplication:** You make a copy of your DNA (the \"X\" shape).\n2.  **Spindle Fibers:** The \"ropes\" that attach to the chromosomes.\n3.  **Metaphase:** Lining up in the middle.\n4.  **Anaphase:** Pulling the sister chromatids apart to opposite sides.\n5.  **Cytokinesis:** The physical split into two new cells.\n\n**The result:** You started with one cell, and now you have two identical twins, each with the exact same set of instructions!",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 3901
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 4,
+        "latencyMs": 12568,
+        "generation": "agent",
+        "lesson": {
+          "title": "The Process of Mitosis",
+          "summary": "A step-by-step exploration of how a single cell divides into two identical daughter cells through the stages of mitosis.",
+          "scenes": [
+            {
+              "title": "Chromosome Duplication",
+              "objective": "Explain how DNA replicates to form sister chromatids before division.",
+              "narration": "Before division begins, the cell duplicates its DNA. Each chromosome now consists of two identical sister chromatids, joined at the center.",
+              "durationSeconds": 10,
+              "visualType": "process",
+              "visualTitle": "DNA Replication",
+              "visualMetaphor": "A mirror reflection of a thread",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Chromosome",
+                  "detail": "Single DNA strand",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "thread"
+                },
+                {
+                  "label": "Sister Chromatids",
+                  "detail": "Duplicated DNA pair",
+                  "role": "result",
+                  "accent": "blue",
+                  "symbol": "thread"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "duplicates"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "Before division begins"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "duplicates its DNA"
+                },
+                {
+                  "atPercent": 90,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "highlight",
+                  "narrationCue": "identical sister chromatids"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "sister chromatids joined at the"
+                }
+              ],
+              "interaction": {
+                "label": "Replication Rate",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 1,
+                "unit": "x",
+                "lowState": "Slow",
+                "highState": "Fast",
+                "prompt": "Adjust the speed of DNA synthesis."
+              },
+              "interactionPrompt": "Slide to simulate the speed of DNA replication.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "biology",
+                "template": "cell_division",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Spindle Fiber Attachment",
+              "objective": "Show how spindle fibers align chromosomes at the cell equator.",
+              "narration": "Spindle fibers emerge from the cell poles. They attach to the center of each chromosome, pulling them toward the middle of the cell.",
+              "durationSeconds": 12,
+              "visualType": "spatial",
+              "visualTitle": "Metaphase Alignment",
+              "visualMetaphor": "A tug of war",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Spindle Fiber",
+                  "detail": "Microtubule structure",
+                  "role": "process",
+                  "accent": "olive",
+                  "symbol": "line"
+                },
+                {
+                  "label": "Chromosome",
+                  "detail": "Aligned chromatids",
+                  "role": "context",
+                  "accent": "blue",
+                  "symbol": "thread"
+                },
+                {
+                  "label": "Cell Pole",
+                  "detail": "Anchor point",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 2,
+                  "to": 0,
+                  "label": "originates"
+                },
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "pulls"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "emerge from the cell poles"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 0,
+                  "relatedIndex": 2,
+                  "action": "reveal",
+                  "narrationCue": "Spindle fibers"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "move",
+                  "narrationCue": "pulling them toward the middle"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "center of each chromosome pulling"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "pulling them toward the middle"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "middle of the cell"
+                }
+              ],
+              "interaction": {
+                "label": "Fiber Tension",
+                "targetIndex": 0,
+                "kind": "stepper",
+                "effect": "intensity",
+                "min": 1,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 5,
+                "unit": "n",
+                "lowState": "Loose",
+                "highState": "Tight",
+                "prompt": "Increase tension to align chromosomes."
+              },
+              "interactionPrompt": "Step up the tension to see the alignment.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "biology",
+                "template": "cell_division",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Sister Chromatid Separation",
+              "objective": "Explain the separation of chromatids into individual chromosomes.",
+              "narration": "The fibers shorten, pulling the sister chromatids apart. Each chromatid is now considered an individual chromosome, moving toward opposite ends of the cell.",
+              "durationSeconds": 12,
+              "visualType": "process",
+              "visualTitle": "Anaphase Separation",
+              "visualMetaphor": "Breaking a link",
+              "motion": "transform",
+              "visualElements": [
+                {
+                  "label": "Chromosome",
+                  "detail": "Separated chromatid",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "thread"
+                },
+                {
+                  "label": "Spindle Fiber",
+                  "detail": "Contracting element",
+                  "role": "process",
+                  "accent": "olive",
+                  "symbol": "line"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "pulls"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "trace",
+                  "narrationCue": "The fibers shorten"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "split",
+                  "narrationCue": "pulling the sister chromatids apart"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "move",
+                  "narrationCue": "moving toward opposite ends"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "toward opposite ends of the"
+                }
+              ],
+              "interaction": {
+                "label": "Separation Force",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "flow",
+                "min": 0,
+                "max": 100,
+                "step": 10,
+                "defaultValue": 50,
+                "unit": "%",
+                "lowState": "Start",
+                "highState": "Complete",
+                "prompt": "Drag to separate the chromosomes."
+              },
+              "interactionPrompt": "Drag the slider to pull the chromosomes apart.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "biology",
+                "template": "cell_division",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Cytokinesis",
+              "objective": "Show the final physical division of the cell membrane.",
+              "narration": "Finally, the cell membrane pinches inward. The cytoplasm divides, resulting in two genetically identical daughter cells.",
+              "durationSeconds": 10,
+              "visualType": "cycle",
+              "visualTitle": "Cytokinesis",
+              "visualMetaphor": "A tightening drawstring bag",
+              "motion": "pulse",
+              "visualElements": [
+                {
+                  "label": "Cell Membrane",
+                  "detail": "Outer boundary",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "circle"
+                },
+                {
+                  "label": "Daughter Cell",
+                  "detail": "New independent cell",
+                  "role": "result",
+                  "accent": "blue",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "divides into"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 30,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "transform",
+                  "narrationCue": "pinches inward"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "remove",
+                  "narrationCue": "cytoplasm divides"
+                },
+                {
+                  "atPercent": 90,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "two genetically identical daughter cells"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "genetically identical daughter cells"
+                }
+              ],
+              "interaction": {
+                "label": "Division Progress",
+                "targetIndex": 0,
+                "kind": "slider",
+                "effect": "scale",
+                "min": 0,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "s",
+                "lowState": "One Cell",
+                "highState": "Two Cells",
+                "prompt": "Slide to complete the division."
+              },
+              "interactionPrompt": "Slide to finish the cell division process.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "biology",
+                "template": "cell_division",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "derivative",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand a derivative, let’s imagine you are driving a car on a curvy road.\n\n### 1. The \"Average\" vs. The \"Instant\"\nIf you drive 60 miles in one hour, your **average speed** is 60 mph. But during that hour, you stopped at a red light, sped up on a highway, and slowed down for a turn. \n\nIf you look at your speedometer at one specific second, it shows your **instantaneous speed**. That is exactly what a derivative is: **the speed of change at one specific moment.**\n\n---\n\n### 2. The Curve and the \"Secant\" Line\nImagine a graph where the horizontal axis is **Time** and the vertical axis is **Distance**. Your trip is a curvy line on this graph.\n\nTo find your speed between two points (let’s call them Point A and Point B), you draw a straight line connecting them. This is called a **secant line**. The slope of this line is your average speed between those two points. \n\n*   **The problem:** If the points are far apart, the line doesn't accurately describe your speed because it ignores the ups and downs in between.\n\n---\n\n### 3. The \"Moving\" Tangent Line\nNow, imagine you want to know your speed at **exactly Point A**. \n\n1.  Take Point B and start sliding it along the curve toward Point A.\n2.  As Point B gets closer to Point A, the secant line starts to tilt and shift.\n3.  As Point B gets infinitely close to Point A, the secant line eventually \"touches\" the curve at only one spot. \n\n**This is the Tangent Line.** \n\nThink of the tangent line like a **flat board** pressed against the curve at that exact point. The slope of that board tells you exactly how steep the curve is at that moment.\n\n---\n\n### 4. Putting it together\n*   **The Curve:** Your actual path.\n*   **The Tangent Line:** A straight line that perfectly matches the direction of the curve at one tiny, microscopic point.\n*   **The Derivative:** The **slope** of that tangent line.\n\n**Why does this matter?**\nIf the tangent line is very steep, your \"speed of change\" is high (you are accelerating or moving fast). If the tangent line is flat (horizontal), your \"speed of change\" is zero (you have stopped or reached a peak).\n\n### Summary for your brain:\n*   **Derivative** = The slope of the tangent line.\n*   **Tangent line** = The \"zoom-in\" version of the curve that looks like a straight line.\n*   **Instantaneous rate of change** = The slope of that straight line at that exact moment.\n\n**In short: A derivative is just a way to measure how fast something is changing at a single, frozen moment in time.**",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 4387
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 7724,
+        "generation": "agent",
+        "lesson": {
+          "title": "Understanding the Derivative",
+          "summary": "An exploration of the derivative as the instantaneous rate of change, visualized through the slope of a tangent line moving along a curve.",
+          "scenes": [
+            {
+              "title": "The Secant Line",
+              "objective": "Introduce the secant line as an approximation of the curve's slope between two points.",
+              "narration": "To find the rate of change on a curve, we start by picking two points. A line connecting them is called a secant line. Its slope gives us the average rate of change over that interval.",
+              "durationSeconds": 12,
+              "visualType": "equation",
+              "visualTitle": "Average Rate of Change",
+              "visualMetaphor": "A bridge between two points on a path",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Curve",
+                  "detail": "A smooth parabolic arc",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Point A",
+                  "detail": "Fixed starting point",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "circle"
+                },
+                {
+                  "label": "Point B",
+                  "detail": "Moving second point",
+                  "role": "source",
+                  "accent": "ochre",
+                  "symbol": "circle"
+                },
+                {
+                  "label": "Secant Line",
+                  "detail": "Line connecting A and B",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "path"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 3,
+                  "label": "anchor"
+                },
+                {
+                  "from": 2,
+                  "to": 3,
+                  "label": "anchor"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "To find the rate of change on a curve"
+                },
+                {
+                  "atPercent": 30,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "we start by picking two points"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "picking two points"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 3,
+                  "relatedIndex": 1,
+                  "action": "connect",
+                  "narrationCue": "A line connecting them is called a secant line"
+                },
+                {
+                  "atPercent": 90,
+                  "targetIndex": 3,
+                  "relatedIndex": -1,
+                  "action": "highlight",
+                  "narrationCue": "Its slope gives us the average rate of change"
+                },
+                {
+                  "atPercent": 68,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "secant line Its slope gives"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "us the average rate of"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 3,
+                  "relatedIndex": -1,
+                  "action": "highlight",
+                  "narrationCue": "of change over that interval"
+                }
+              ],
+              "interaction": {
+                "label": "Point Distance",
+                "targetIndex": 2,
+                "kind": "slider",
+                "effect": "translate",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 3,
+                "unit": "units",
+                "lowState": "Close",
+                "highState": "Far",
+                "prompt": "Slide to move the second point closer to the first."
+              },
+              "interactionPrompt": "Adjust the distance between points to see how the secant line changes.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "derivative",
+                "expression": "x*x",
+                "secondaryExpression": "0",
+                "parameter": "x",
+                "parameterMin": 0,
+                "parameterMax": 5,
+                "xMin": -1,
+                "xMax": 6,
+                "yMin": -1,
+                "yMax": 25,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "The Tangent Limit",
+              "objective": "Demonstrate that as the distance between points approaches zero, the secant becomes the tangent.",
+              "narration": "As we move the second point closer to the first, the secant line rotates. When the distance becomes zero, the line touches the curve at only one point. This is the tangent line, representing the instantaneous rate of change.",
+              "durationSeconds": 15,
+              "visualType": "process",
+              "visualTitle": "The Limit Process",
+              "visualMetaphor": "A rotating lever settling into position",
+              "motion": "transform",
+              "visualElements": [
+                {
+                  "label": "Curve",
+                  "detail": "The same parabolic arc",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Tangent Line",
+                  "detail": "The limiting line position",
+                  "role": "result",
+                  "accent": "blue",
+                  "symbol": "path"
+                },
+                {
+                  "label": "Slope Value",
+                  "detail": "Numerical derivative value",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "stack"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 2,
+                  "label": "defines"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "rotate",
+                  "narrationCue": "the secant line rotates"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "transform",
+                  "narrationCue": "the line touches the curve at only one point"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "reveal",
+                  "narrationCue": "This is the tangent line"
+                },
+                {
+                  "atPercent": 95,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "highlight",
+                  "narrationCue": "representing the instantaneous rate of change"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "one point This is the"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "line representing the instantaneous rate"
+                }
+              ],
+              "interaction": {
+                "label": "Position",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "rotate",
+                "min": 0,
+                "max": 4,
+                "step": 1,
+                "defaultValue": 2,
+                "unit": "x",
+                "lowState": "Start",
+                "highState": "End",
+                "prompt": "Move the tangent point along the curve."
+              },
+              "interactionPrompt": "Slide to move the tangent point and observe the changing slope.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "derivative",
+                "expression": "x*x",
+                "secondaryExpression": "2*x",
+                "parameter": "x",
+                "parameterMin": 0,
+                "parameterMax": 4,
+                "xMin": -1,
+                "xMax": 5,
+                "yMin": -1,
+                "yMax": 16,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "normal-distribution",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand a normal distribution (often called a \"Bell Curve\"), think of it as a way to visualize how data is spread out. \n\nHere is the breakdown of the three key components:\n\n---\n\n### 1. The Mean: The \"Anchor\" (Left-to-Right)\nThe **mean** is the average value of your data. On a graph, it is the exact center of the bell.\n\n*   **What it does:** It acts as an anchor. If you increase the mean, the entire bell curve slides to the **right**. If you decrease the mean, the curve slides to the **left**.\n*   **Visual:** Imagine the bell curve is a physical object sitting on a table. Changing the mean is like picking up the whole curve and sliding it along the table without changing its shape.\n\n### 2. The Standard Deviation: The \"Stretch\" (Width)\nThe **standard deviation** measures how spread out your data is. It tells you how far, on average, the data points are from the mean.\n\n*   **What it does:** It controls the width of the bell.\n    *   **Small Standard Deviation:** The data is clustered tightly around the mean. The curve looks **tall and skinny** (like a needle).\n    *   **Large Standard Deviation:** The data is spread far apart. The curve looks **short and wide** (like a flat hill).\n*   **Visual:** Imagine the bell curve is made of stretchy rubber. A small standard deviation squishes the sides inward, forcing the middle to grow taller. A large standard deviation pulls the sides outward, causing the middle to flatten down.\n\n---\n\n### 3. The Area Under the Curve: The \"Probability\"\nThe most important rule of a normal distribution is that the **total area under the curve is always equal to 1 (or 100%).**\n\nThink of the area under the curve as representing the **entire population** of your data.\n\n*   **What it means:** Because the total area is 100%, the area between any two points on the graph represents the **percentage of data** that falls within that range.\n*   **Example:** If you want to know what percentage of people are between 5'5\" and 5'10\" tall, you calculate the area under the curve between those two points. If that area covers 20% of the total space, it means 20% of the population falls into that height range.\n\n---\n\n### Putting it all together\nImagine you are looking at the test scores of a class:\n\n1.  **Mean:** If the teacher makes the test easier, the **mean** increases, and the whole bell curve shifts to the right (higher scores).\n2.  **Standard Deviation:** If the students all studied the same amount, their scores will be similar, creating a **tall, skinny curve** (low standard deviation). If some students studied a lot and others didn't study at all, the scores will be spread out, creating a **flat, wide curve** (high standard deviation).\n3.  **Area:** If you want to know how many students got an \"A,\" you look at the **area under the curve** at the far right side. That shaded space represents the percentage of the class that achieved that score.\n\n**Summary:**\n*   **Mean** moves the center.\n*   **Standard Deviation** changes the width.\n*   **Area** represents the probability (the percentage of the total).",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 3887
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 3,
+        "latencyMs": 6900,
+        "generation": "agent",
+        "lesson": {
+          "title": "Understanding the Normal Distribution",
+          "summary": "An exploration of how the mean and standard deviation shape the normal distribution curve and the significance of the area under the curve.",
+          "scenes": [
+            {
+              "title": "The Center of the Curve",
+              "objective": "Explain how the mean determines the horizontal position of the normal distribution.",
+              "narration": "The mean is the center of our distribution. It acts as the anchor for the entire curve. By shifting the mean, we slide the peak left or right along the axis.",
+              "durationSeconds": 12,
+              "visualType": "comparison",
+              "visualTitle": "Mean and Position",
+              "visualMetaphor": "A sliding peak on a flat landscape",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Normal Curve",
+                  "detail": "The bell shaped probability density function",
+                  "role": "process",
+                  "accent": "ink",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Mean Value",
+                  "detail": "The horizontal center point",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "centers"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "The mean is the center"
+                },
+                {
+                  "atPercent": 40,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "acts as the anchor"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "move",
+                  "narrationCue": "shifting the mean"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "the peak left or right"
+                }
+              ],
+              "interaction": {
+                "label": "Mean Position",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "translate",
+                "min": -5,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "units",
+                "lowState": "Left",
+                "highState": "Right",
+                "prompt": "Slide to move the distribution center"
+              },
+              "interactionPrompt": "Adjust the mean to see the curve shift.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "distribution",
+                "expression": "exp(-0.5*((x-0)/1)^2)",
+                "secondaryExpression": "0",
+                "parameter": "mean",
+                "parameterMin": -5,
+                "parameterMax": 5,
+                "xMin": -10,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 1,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Spread and Variation",
+              "objective": "Explain how standard deviation controls the width of the distribution.",
+              "narration": "Standard deviation measures the spread. A small value keeps the data tightly clustered near the mean. A larger value flattens the curve as data spreads further out.",
+              "durationSeconds": 12,
+              "visualType": "comparison",
+              "visualTitle": "Standard Deviation and Width",
+              "visualMetaphor": "An accordion stretching and compressing",
+              "motion": "pulse",
+              "visualElements": [
+                {
+                  "label": "Normal Curve",
+                  "detail": "The bell shaped probability density function",
+                  "role": "process",
+                  "accent": "ink",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Standard Deviation",
+                  "detail": "The width parameter",
+                  "role": "source",
+                  "accent": "ochre",
+                  "symbol": "arrow"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "controls width"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "Standard deviation measures the spread"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "scale",
+                  "narrationCue": "keeps the data tightly clustered"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "flattens the curve"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "the curve as data spreads"
+                }
+              ],
+              "interaction": {
+                "label": "Spread",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "scale",
+                "min": 1,
+                "max": 3,
+                "step": 1,
+                "defaultValue": 1,
+                "unit": "sigma",
+                "lowState": "Narrow",
+                "highState": "Wide",
+                "prompt": "Adjust to change curve width"
+              },
+              "interactionPrompt": "Change the standard deviation to see the curve stretch.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "distribution",
+                "expression": "exp(-0.5*((x-0)/1)^2)",
+                "secondaryExpression": "1",
+                "parameter": "std",
+                "parameterMin": 0.5,
+                "parameterMax": 2,
+                "xMin": -10,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 1,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Area Under the Curve",
+              "objective": "Explain that the area under the curve represents total probability.",
+              "narration": "The total area under the curve is always one. This represents one hundred percent probability. Shading a section shows the likelihood of values falling within that range.",
+              "durationSeconds": 12,
+              "visualType": "system",
+              "visualTitle": "Probability as Area",
+              "visualMetaphor": "Filling a container with liquid",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Normal Curve",
+                  "detail": "The density boundary",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Shaded Area",
+                  "detail": "The probability region",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "square"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "represents probability"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "The total area under the curve"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "accumulate",
+                  "narrationCue": "always one"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "highlight",
+                  "narrationCue": "likelihood of values"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "likelihood of values falling within"
+                }
+              ],
+              "interaction": {
+                "label": "Range",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": -2,
+                "max": 2,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "sigma",
+                "lowState": "Lower",
+                "highState": "Upper",
+                "prompt": "Select range to calculate area"
+              },
+              "interactionPrompt": "Slide to highlight different probability regions.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "integral",
+                "expression": "exp(-0.5*x^2)",
+                "secondaryExpression": "0",
+                "parameter": "range",
+                "parameterMin": -3,
+                "parameterMax": 3,
+                "xMin": -4,
+                "xMax": 4,
+                "yMin": 0,
+                "yMax": 1,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "differential-equation",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand a differential equation, you first need to understand the two things it connects: **where you are** and **where you are going.**\n\nImagine you have a hot cup of coffee sitting in a room. \n\n### 1. The Current State\nThe \"current state\" is simply the temperature of the coffee right now. Let’s call this **$T$**. \n\n### 2. The Rate of Change\nThe \"rate of change\" is how fast the temperature is dropping. If the coffee is cooling down, the temperature is changing over time. In math, we call this **$dT/dt$** (the change in temperature over the change in time).\n\n### 3. The Connection (The Differential Equation)\nA differential equation is a \"rule\" that links these two things together. \n\nFor cooling, the rule is **Newton’s Law of Cooling**. It says: *The speed at which an object cools down is proportional to the difference between its temperature and the room’s temperature.*\n\nIn math, it looks like this:\n$$\\frac{dT}{dt} = -k(T - T_{room})$$\n\n**Here is why this is a \"connection\":**\n\n*   **If the coffee is very hot ($T$ is high):** The gap between the coffee and the room is huge. The equation says the \"rate of change\" ($dT/dt$) must be a large negative number. **Result:** The coffee cools down very fast.\n*   **If the coffee is just warm ($T$ is low):** The gap between the coffee and the room is small. The equation says the \"rate of change\" ($dT/dt$) must be a small number. **Result:** The coffee cools down very slowly.\n*   **If the coffee is the same as the room ($T = T_{room}$):** The gap is zero. The equation says the rate of change is zero. **Result:** The coffee stops cooling down.\n\n### Why is this useful?\nIn your daily life, you usually only know the **current state** (the coffee is 150 degrees). But you don't know the **future** (what temperature will it be in 10 minutes?).\n\nA differential equation is like a **GPS for change.** It doesn't tell you the future directly; instead, it tells you the *rule* for how things move. \n\nIf you know the rule (the differential equation) and where you are starting (the initial state), you can use calculus to \"solve\" the equation. This turns the rule into a **prediction formula** that tells you exactly what the temperature will be at any time in the future.\n\n### Summary\n*   **Current State:** Where the system is right now.\n*   **Rate of Change:** How the system is moving/shifting.\n*   **Differential Equation:** The \"law\" that dictates how the current state forces the system to change next.",
+        "keywordCoverage": 0.75,
+        "runnable": false,
+        "latencyMs": 3189
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 0.75,
+        "structureChecks": {
+          "atLeastTwoScenes": false,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": false,
+        "sceneCount": 1,
+        "latencyMs": 4800,
+        "generation": "agent",
+        "lesson": {
+          "title": "Newton's Law of Cooling",
+          "summary": "An exploration of how differential equations relate the current state of a system to its rate of change, using the cooling of a hot object as the primary model.",
+          "scenes": [
+            {
+              "title": "The Cooling Mechanism",
+              "objective": "Define the relationship between temperature difference and cooling rate.",
+              "narration": "When a hot object sits in a cooler room, it loses heat. The rate of cooling depends on the difference between the object temperature and the room temperature. A larger gap means a faster drop in temperature.",
+              "durationSeconds": 12,
+              "visualType": "equation",
+              "visualTitle": "Cooling Dynamics",
+              "visualMetaphor": "A thermometer inside a room",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Object Temperature",
+                  "detail": "The current heat level",
+                  "role": "source",
+                  "accent": "red",
+                  "symbol": "thermometer"
+                },
+                {
+                  "label": "Room Temperature",
+                  "detail": "The ambient baseline",
+                  "role": "context",
+                  "accent": "blue",
+                  "symbol": "square"
+                },
+                {
+                  "label": "Cooling Rate",
+                  "detail": "The speed of change",
+                  "role": "result",
+                  "accent": "ink",
+                  "symbol": "arrow"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 2,
+                  "label": "drives"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "When a hot object"
+                },
+                {
+                  "atPercent": 30,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "sits in a cooler room"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "The rate of cooling"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "move",
+                  "narrationCue": "depends on the difference"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "and the room temperature A"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "gap means a faster drop"
+                }
+              ],
+              "interaction": {
+                "label": "Temperature Gap",
+                "targetIndex": 0,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 20,
+                "max": 100,
+                "step": 5,
+                "defaultValue": 80,
+                "unit": "degrees",
+                "lowState": "Slow cooling",
+                "highState": "Rapid cooling",
+                "prompt": "Adjust the initial temperature to see how the rate of change responds."
+              },
+              "interactionPrompt": "Slide to change the heat difference.",
+              "renderSpec": {
+                "domain": "mathematics",
+                "engine": "manim",
+                "template": "differential_equation",
+                "expression": "-0.5*(y-20)",
+                "secondaryExpression": "20",
+                "parameter": "k",
+                "parameterMin": 0.1,
+                "parameterMax": 1,
+                "xMin": 0,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 100,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "breadth-first-search",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand **Breadth-First Search (BFS)**, imagine you are standing in the middle of a giant maze. You want to find the exit, but you want to find the **absolute shortest path** to get there.\n\nBFS explores the maze in \"waves.\" It looks at everything one step away, then everything two steps away, and so on.\n\n---\n\n### 1. The Core Components\nTo make BFS work, you need three main tools:\n\n*   **The Queue:** Think of this as a \"To-Do List.\" You add nodes to the back of the line and take them off from the front. Because it is \"First-In, First-Out,\" it ensures you explore the closest nodes before moving further away.\n*   **Visited List:** This is your \"Been There\" list. Because graphs can have loops (e.g., A connects to B, and B connects to A), you need to keep track of where you’ve already been so you don't get stuck in an infinite loop.\n*   **Neighbors:** These are the nodes directly connected to your current location.\n\n---\n\n### 2. How the Algorithm Works (Step-by-Step)\n\n1.  **Start:** Pick a starting node. Mark it as \"Visited\" and put it into your **Queue**.\n2.  **Loop:** While your Queue is not empty:\n    *   **Remove** the node at the front of the queue (let’s call it `Current`).\n    *   **Look at its neighbors:** For every neighbor of `Current`:\n        *   If you haven't visited that neighbor yet:\n            *   Mark it as **Visited**.\n            *   Add it to the **back of the Queue**.\n    *   **Repeat.**\n\n---\n\n### 3. Why it finds the \"Shortest Path\"\nThis is the magic of BFS. Because you explore all nodes at distance 1 before you ever look at a node at distance 2, you are guaranteed to hit the target node as soon as possible.\n\n**Think of it like a ripple in a pond:**\n*   The ripple starts at the center.\n*   It hits everything 1 inch away first.\n*   Then it hits everything 2 inches away.\n*   If your target is 3 inches away, the ripple *cannot* reach it until it has finished covering everything 1 and 2 inches away. Therefore, the first time you touch the target, you have found the shortest path.\n\n---\n\n### 4. A Simple Example\nImagine a graph: **A — B — C** and **A — D — C**\n\n*   **Start at A.** Queue: `[A]`. Visited: `{A}`.\n*   **Pop A.** Neighbors are B and D. Add them to queue. Queue: `[B, D]`. Visited: `{A, B, D}`.\n*   **Pop B.** Neighbor is C. Add it to queue. Queue: `[D, C]`. Visited: `{A, B, D, C}`.\n*   **Pop D.** Neighbor C is already visited, so ignore it.\n*   **Pop C.** You found the target!\n\nBecause you explored B and D (distance 1) before C (distance 2), you found the shortest path.\n\n---\n\n### Summary for your notes:\n*   **Queue:** Keeps track of the order of exploration (First-In, First-Out).\n*   **Visited:** Prevents infinite loops and redundant work.\n*   **Neighbors:** The nodes you explore next.\n*   **Shortest Path:** Guaranteed in unweighted graphs because BFS explores in expanding layers of distance.",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 4104
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 0.75,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 6542,
+        "generation": "agent",
+        "lesson": {
+          "title": "Breadth First Search Algorithm",
+          "summary": "An exploration of how Breadth First Search navigates a graph to find the shortest path by using a queue to track nodes layer by layer.",
+          "scenes": [
+            {
+              "title": "The Graph Structure",
+              "objective": "Introduce the graph as a set of nodes and edges.",
+              "narration": "A graph consists of nodes connected by edges. We want to find the shortest path from a starting point to any other node.",
+              "durationSeconds": 8,
+              "visualType": "system",
+              "visualTitle": "Graph Topology",
+              "visualMetaphor": "A web of interconnected points",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Start Node",
+                  "detail": "The origin point",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "node"
+                },
+                {
+                  "label": "Target Node",
+                  "detail": "The destination",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "node"
+                },
+                {
+                  "label": "Edge",
+                  "detail": "Connection path",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "path"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 2,
+                  "label": "link"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "A graph consists of nodes"
+                },
+                {
+                  "atPercent": 40,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "connect",
+                  "narrationCue": "connected by edges"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "draw",
+                  "narrationCue": "find the shortest path"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "find the shortest path from"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "from a starting point to"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "to any other node"
+                }
+              ],
+              "interaction": {
+                "label": "Node Count",
+                "targetIndex": 0,
+                "kind": "slider",
+                "effect": "scale",
+                "min": 3,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 5,
+                "unit": "nodes",
+                "lowState": "Small graph",
+                "highState": "Large graph",
+                "prompt": "Adjust the number of nodes to see how the graph complexity changes."
+              },
+              "interactionPrompt": "Adjust the number of nodes to see how the graph complexity changes.",
+              "renderSpec": {
+                "domain": "computing",
+                "engine": "network",
+                "template": "network",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "nodes",
+                "parameterMin": 3,
+                "parameterMax": 10,
+                "xMin": 0,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 10,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "The Queue Mechanism",
+              "objective": "Explain the role of the FIFO queue in BFS.",
+              "narration": "Breadth First Search uses a queue to manage the order of exploration. We add neighbors to the back and remove them from the front.",
+              "durationSeconds": 10,
+              "visualType": "process",
+              "visualTitle": "FIFO Queue",
+              "visualMetaphor": "A line of people waiting",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Queue",
+                  "detail": "First in first out storage",
+                  "role": "process",
+                  "accent": "olive",
+                  "symbol": "stack"
+                },
+                {
+                  "label": "Node A",
+                  "detail": "Explored node",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "node"
+                },
+                {
+                  "label": "Node B",
+                  "detail": "Next in line",
+                  "role": "result",
+                  "accent": "ink",
+                  "symbol": "node"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "enqueue"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "uses a queue"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "accumulate",
+                  "narrationCue": "add neighbors to the back"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "move",
+                  "narrationCue": "remove them from the front"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "We add neighbors to the"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "the back and remove them"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "them from the front"
+                }
+              ],
+              "interaction": {
+                "label": "Queue Speed",
+                "targetIndex": 0,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 2,
+                "unit": "speed",
+                "lowState": "Slow exploration",
+                "highState": "Fast exploration",
+                "prompt": "Change the speed of the queue processing."
+              },
+              "interactionPrompt": "Change the speed of the queue processing.",
+              "renderSpec": {
+                "domain": "computing",
+                "engine": "manim",
+                "template": "process",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "speed",
+                "parameterMin": 1,
+                "parameterMax": 5,
+                "xMin": 0,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 10,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "photosynthesis",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand photosynthesis, think of a plant as a **tiny solar-powered kitchen.** \n\nThe plant wants to make its own food (a sugar called **glucose**), and it uses three simple ingredients from the environment to do it.\n\nHere is the step-by-step recipe:\n\n---\n\n### 1. The Ingredients (What goes in)\n*   **Sunlight:** This is the **energy** (the \"stove\"). Without heat/energy, you can’t cook anything.\n*   **Water ($H_2O$):** The plant drinks this up through its roots from the soil.\n*   **Carbon Dioxide ($CO_2$):** The plant \"breathes\" this in from the air through tiny holes in its leaves.\n\n### 2. The Kitchen (Where it happens)\nInside the plant’s leaves are millions of tiny structures called **chloroplasts**. These contain a green pigment called **chlorophyll**. \n*   **Think of chlorophyll as a solar panel:** It captures the sunlight and holds onto that energy so the plant can use it to start cooking.\n\n### 3. The Cooking Process (The Chemical Reaction)\nOnce the plant has the sunlight, water, and carbon dioxide, the magic happens:\n\n1.  **Splitting the Water:** The plant uses the energy from the sunlight to \"crack open\" the water molecules ($H_2O$). It keeps the Hydrogen ($H$) and discards the Oxygen ($O$).\n2.  **Mixing the Ingredients:** The plant takes that Hydrogen and mixes it with the Carbon Dioxide ($CO_2$) it pulled from the air. \n3.  **Creating the Meal:** By rearranging the atoms of Hydrogen, Carbon, and Oxygen, the plant builds a new molecule: **Glucose ($C_6H_{12}O_6$)**. This is the plant's food—it’s essentially a sugary snack that gives the plant energy to grow.\n\n### 4. The Leftovers (What comes out)\nWhen you cook, you sometimes have scraps left over. In photosynthesis, the plant has extra Oxygen atoms left over from the water it split. \n*   The plant doesn't need this extra oxygen, so it releases it back into the air through its leaves. \n*   **This is a lucky break for us:** We breathe in that \"leftover\" oxygen to survive!\n\n---\n\n### The Summary (The Big Picture)\n\nYou can think of the whole process like this:\n\n**[Sunlight Energy] + [Water] + [Carbon Dioxide] $\\rightarrow$ [Glucose] + [Oxygen]**\n\n*   **The Goal:** The plant makes **Glucose** to feed itself.\n*   **The Bonus:** The plant releases **Oxygen** as a byproduct, which keeps humans and animals alive. \n\n**In short:** Plants take the energy from the sun and use it to turn air and water into sugar, leaving behind the oxygen we need to breathe.",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 4200
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 6669,
+        "generation": "agent",
+        "lesson": {
+          "title": "The Process of Photosynthesis",
+          "summary": "An exploration of how plants convert light, water, and carbon dioxide into chemical energy and oxygen through photosynthesis.",
+          "scenes": [
+            {
+              "title": "The Ingredients of Photosynthesis",
+              "objective": "Identify the primary inputs required for photosynthesis.",
+              "narration": "Plants require three main ingredients to create their own food. They draw water from the soil, capture carbon dioxide from the air, and absorb light energy from the sun.",
+              "durationSeconds": 12,
+              "visualType": "system",
+              "visualTitle": "Photosynthesis Inputs",
+              "visualMetaphor": "A balanced scale of resources",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Sunlight",
+                  "detail": "Radiant energy source",
+                  "role": "source",
+                  "accent": "ochre",
+                  "symbol": "sun"
+                },
+                {
+                  "label": "Water",
+                  "detail": "Absorbed through roots",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "drop"
+                },
+                {
+                  "label": "Carbon Dioxide",
+                  "detail": "Taken from atmosphere",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "cloud"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "energy supply"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "capture carbon dioxide"
+                },
+                {
+                  "atPercent": 40,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "draw water"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "absorb light energy"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "the soil capture carbon dioxide"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "from the air and absorb"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "light energy from the sun"
+                }
+              ],
+              "interaction": {
+                "label": "Light Intensity",
+                "targetIndex": 0,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 0,
+                "max": 100,
+                "step": 10,
+                "defaultValue": 50,
+                "unit": "percent",
+                "lowState": "Dim light",
+                "highState": "Bright sunlight",
+                "prompt": "Adjust the sunlight intensity to see how it affects the plant energy intake."
+              },
+              "interactionPrompt": "Slide to change light intensity.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "illustration",
+                "template": "illustration",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "The Chemical Transformation",
+              "objective": "Show the conversion of inputs into glucose and oxygen.",
+              "narration": "Inside the leaf, these ingredients undergo a transformation. The energy rearranges the atoms to produce glucose for the plant and oxygen as a byproduct.",
+              "durationSeconds": 15,
+              "visualType": "process",
+              "visualTitle": "Chemical Conversion",
+              "visualMetaphor": "A factory assembly line",
+              "motion": "transform",
+              "visualElements": [
+                {
+                  "label": "Inputs",
+                  "detail": "Water and CO2",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "stack"
+                },
+                {
+                  "label": "Glucose",
+                  "detail": "Energy storage",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "cube"
+                },
+                {
+                  "label": "Oxygen",
+                  "detail": "Released byproduct",
+                  "role": "result",
+                  "accent": "blue",
+                  "symbol": "wave"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "converts to"
+                },
+                {
+                  "from": 0,
+                  "to": 2,
+                  "label": "releases"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "undergo a transformation"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "produce glucose"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "oxygen as a byproduct"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "atoms to produce glucose for"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "for the plant and oxygen"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "oxygen as a byproduct"
+                }
+              ],
+              "interaction": {
+                "label": "Reaction Rate",
+                "targetIndex": 0,
+                "kind": "stepper",
+                "effect": "flow",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 1,
+                "unit": "x",
+                "lowState": "Slow",
+                "highState": "Fast",
+                "prompt": "Increase the reaction rate to see how fast glucose accumulates."
+              },
+              "interactionPrompt": "Step the reaction rate.",
+              "renderSpec": {
+                "domain": "chemistry",
+                "engine": "molecule",
+                "template": "molecule",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "C6H12O6",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "supply-demand",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand how prices are set in a market, think of it as a tug-of-war between buyers and sellers.\n\n### 1. The Two Sides\n*   **Demand (The Buyers):** Think of this as the \"willingness to pay.\" Generally, as the price of an item goes down, more people want to buy it. This creates a **downward-sloping line** on a graph.\n*   **Supply (The Sellers):** Think of this as the \"willingness to sell.\" As the price of an item goes up, businesses want to make more of it because they can earn more profit. This creates an **upward-sloping line** on a graph.\n\n### 2. Finding the Equilibrium\nIf you put both lines on the same graph, they will cross at one specific point. This is the **Equilibrium**.\n\n*   **At this point, the market is \"happy.\"** The number of items sellers want to sell exactly matches the number of items buyers want to buy.\n*   **The Price:** This is the \"Equilibrium Price.\" It’s the price where the shelves aren't empty (shortage) and there isn't a pile of unsold inventory (surplus).\n*   **The Quantity:** This is the \"Equilibrium Quantity,\" or the total amount of the product that will be sold.\n\n---\n\n### 3. What happens when Demand increases?\nImagine a sudden trend makes a product (like a new gaming console or a specific sneaker) much more popular. The **Demand curve shifts to the right.**\n\nHere is the step-by-step reaction:\n\n1.  **The Shortage:** At the *original* price, suddenly more people want the item than there are items available. The shelves go empty.\n2.  **The Price Hike:** Because the item is now scarce, sellers realize they can raise the price. Buyers, desperate to get the item, are willing to pay more.\n3.  **The New Equilibrium:** As the price rises, two things happen:\n    *   Some buyers drop out because it’s now too expensive.\n    *   Sellers start producing more of the item to take advantage of the higher price.\n4.  **The Result:** The market settles at a **higher price** and a **higher quantity** than before.\n\n### A Simple Summary\n*   **Equilibrium:** The \"sweet spot\" where supply meets demand.\n*   **Demand Increase:** People want more of it $\\rightarrow$ Shortage $\\rightarrow$ Price goes up $\\rightarrow$ Sellers make more $\\rightarrow$ New, higher equilibrium.\n\n**Real-world example:** Think of **hand sanitizer** at the start of 2020. Demand skyrocketed (the curve shifted right). Because supply couldn't keep up immediately, prices spiked. Eventually, companies produced way more sanitizer, and the market found a new balance.",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 6336
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 8706,
+        "generation": "agent",
+        "lesson": {
+          "title": "Supply and Demand Equilibrium",
+          "summary": "An exploration of how market forces determine price and quantity, and the impact of shifting demand on the equilibrium point.",
+          "scenes": [
+            {
+              "title": "Defining Market Equilibrium",
+              "objective": "Explain the intersection of supply and demand curves.",
+              "narration": "In a market, the demand curve slopes downward, showing that lower prices encourage more buying. The supply curve slopes upward, as higher prices motivate producers to sell more. Where these two lines cross, we find the equilibrium price and quantity.",
+              "durationSeconds": 15,
+              "visualType": "equation",
+              "visualTitle": "Market Equilibrium Point",
+              "visualMetaphor": "a balance scale where two opposing forces meet",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "Demand Curve",
+                  "detail": "Downward sloping line of consumer interest",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Supply Curve",
+                  "detail": "Upward sloping line of producer output",
+                  "role": "source",
+                  "accent": "ochre",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Equilibrium Point",
+                  "detail": "Market clearing price and quantity",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 2,
+                  "label": "intersection"
+                },
+                {
+                  "from": 1,
+                  "to": 2,
+                  "label": "intersection"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "demand curve slopes downward"
+                },
+                {
+                  "atPercent": 30,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "supply curve slopes upward"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "highlight",
+                  "narrationCue": "where these two lines cross"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "reveal",
+                  "narrationCue": "equilibrium price and quantity"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "sell more Where these two"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "we find the equilibrium price"
+                }
+              ],
+              "interaction": {
+                "label": "Price Level",
+                "targetIndex": 2,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 1,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 5,
+                "unit": "dollars",
+                "lowState": "Surplus",
+                "highState": "Shortage",
+                "prompt": "Adjust the price to see market pressure"
+              },
+              "interactionPrompt": "Slide to change the price and observe the imbalance.",
+              "renderSpec": {
+                "domain": "economics",
+                "engine": "manim",
+                "template": "function_graph",
+                "expression": "10-x",
+                "secondaryExpression": "x",
+                "parameter": "p",
+                "parameterMin": 0,
+                "parameterMax": 10,
+                "xMin": 0,
+                "xMax": 10,
+                "yMin": 0,
+                "yMax": 10,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Shifting Demand",
+              "objective": "Demonstrate the effect of an increase in demand on equilibrium.",
+              "narration": "When consumer preference grows, the entire demand curve shifts to the right. This creates a new equilibrium at a higher price and a higher quantity. The market adjusts to this new reality.",
+              "durationSeconds": 15,
+              "visualType": "process",
+              "visualTitle": "Demand Shift Impact",
+              "visualMetaphor": "a sliding wall pushing a new boundary",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Old Demand",
+                  "detail": "Initial consumer demand curve",
+                  "role": "source",
+                  "accent": "blue",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "New Demand",
+                  "detail": "Increased consumer demand curve",
+                  "role": "result",
+                  "accent": "blue",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "Supply Curve",
+                  "detail": "Static producer supply curve",
+                  "role": "context",
+                  "accent": "ochre",
+                  "symbol": "graph"
+                },
+                {
+                  "label": "New Equilibrium",
+                  "detail": "Updated market clearing point",
+                  "role": "result",
+                  "accent": "red",
+                  "symbol": "circle"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "shifts right"
+                },
+                {
+                  "from": 1,
+                  "to": 3,
+                  "label": "defines"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "demand curve shifts to the right"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 3,
+                  "relatedIndex": 1,
+                  "action": "draw",
+                  "narrationCue": "new equilibrium"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 3,
+                  "relatedIndex": 2,
+                  "action": "highlight",
+                  "narrationCue": "higher price and higher quantity"
+                },
+                {
+                  "atPercent": 44,
+                  "targetIndex": 3,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "This creates a new equilibrium"
+                },
+                {
+                  "atPercent": 56,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "compare",
+                  "narrationCue": "equilibrium at a higher price"
+                },
+                {
+                  "atPercent": 68,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "price and a higher quantity"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "quantity The market adjusts to"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 3,
+                  "relatedIndex": -1,
+                  "action": "highlight",
+                  "narrationCue": "to this new reality"
+                }
+              ],
+              "interaction": {
+                "label": "Demand Intensity",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "scale",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 1,
+                "unit": "shift",
+                "lowState": "Baseline",
+                "highState": "High Demand",
+                "prompt": "Increase demand to see the shift"
+              },
+              "interactionPrompt": "Drag to increase market demand.",
+              "renderSpec": {
+                "domain": "economics",
+                "engine": "manim",
+                "template": "function_graph",
+                "expression": "12-x",
+                "secondaryExpression": "x",
+                "parameter": "d",
+                "parameterMin": 1,
+                "parameterMax": 5,
+                "xMin": 0,
+                "xMax": 12,
+                "yMin": 0,
+                "yMax": 12,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "plate-tectonics",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand plate tectonics, imagine the Earth’s outer shell (the crust) not as a solid, unbroken eggshell, but as a **jigsaw puzzle** made of giant, moving slabs of rock called **tectonic plates.**\n\nThese plates are constantly shifting, but they don’t move on their own. They are pushed and pulled by the engine inside the Earth.\n\n---\n\n### 1. The Engine: Mantle Motion\nDeep beneath the crust is the **mantle**. It is made of solid rock, but because it is under immense heat and pressure, it acts like thick, slow-moving caramel.\n\n*   **Convection Currents:** Heat from the Earth’s core causes the hot mantle material to rise toward the surface. As it reaches the top, it cools down, becomes denser, and sinks back toward the core.\n*   **The Conveyor Belt:** This rising and sinking creates a circular motion. Because the tectonic plates are floating on top of this moving mantle, they are dragged along like rafts on a slow-moving river.\n\n---\n\n### 2. The Three Ways Plates Interact\nWhere these giant plates meet (called **plate boundaries**), they interact in three specific ways. Think of these as the \"rules of the road\" for the Earth’s crust.\n\n#### A. Divergent Boundaries (Moving Apart)\n*   **The Action:** Two plates pull away from each other.\n*   **What happens:** As they pull apart, a gap opens up. Hot magma from the mantle rises to fill that gap, cools down, and creates **new crust**.\n*   **Example:** The Mid-Atlantic Ridge, where the ocean floor is slowly spreading apart.\n\n#### B. Convergent Boundaries (Crashing Together)\n*   **The Action:** Two plates collide head-on.\n*   **What happens:** This is a violent process. \n    *   If a heavy ocean plate hits a light land plate, the heavy one sinks underneath (this is called **subduction**), melting into the mantle and often creating volcanoes.\n    *   If two land plates hit, they crumple upward like a car crash, pushing the rock high into the sky to form **mountain ranges** (like the Himalayas).\n\n#### C. Transform Boundaries (Sliding Past)\n*   **The Action:** Two plates grind past each other sideways.\n*   **What happens:** The plates don’t slide smoothly because the rock is jagged and rough. They get stuck, pressure builds up for years, and then they suddenly \"snap\" forward to release that energy. This snap is what we feel as an **earthquake**.\n*   **Example:** The San Andreas Fault in California.\n\n---\n\n### Summary Table for Beginners\n\n| Boundary Type | Motion | Result |\n| :--- | :--- | :--- |\n| **Divergent** | Pulling Apart | New crust is created (volcanoes/ridges) |\n| **Convergent** | Crashing Together | Crust is destroyed or pushed up (mountains/volcanoes) |\n| **Transform** | Sliding Past | Crust is neither created nor destroyed (earthquakes) |\n\n**The Big Picture:** The Earth is a recycling machine. New crust is born at **divergent** boundaries, and old crust is recycled back into the mantle at **convergent** boundaries. The **transform** boundaries act as the \"hinges\" that allow the plates to move around the sphere of the Earth without getting stuck.",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 5086
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 2,
+        "latencyMs": 6763,
+        "generation": "agent",
+        "lesson": {
+          "title": "Plate Tectonics and Earth's Crust",
+          "summary": "An exploration of how mantle convection drives the movement of tectonic plates and the three primary types of plate boundaries.",
+          "scenes": [
+            {
+              "title": "Mantle Convection",
+              "objective": "Explain how heat from the core drives the movement of plates.",
+              "narration": "Deep within the Earth, intense heat creates convection currents in the mantle. Hot material rises toward the surface, while cooler material sinks back down, creating a cycle that pushes the crust above.",
+              "durationSeconds": 12,
+              "visualType": "cycle",
+              "visualTitle": "Mantle Convection Currents",
+              "visualMetaphor": "A boiling pot of thick liquid",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "Core Heat",
+                  "detail": "The source of thermal energy",
+                  "role": "source",
+                  "accent": "red",
+                  "symbol": "circle"
+                },
+                {
+                  "label": "Mantle Flow",
+                  "detail": "Rising and sinking magma",
+                  "role": "process",
+                  "accent": "olive",
+                  "symbol": "wave"
+                },
+                {
+                  "label": "Tectonic Plate",
+                  "detail": "The rigid outer crust",
+                  "role": "result",
+                  "accent": "ink",
+                  "symbol": "stack"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 0,
+                  "to": 1,
+                  "label": "drives"
+                },
+                {
+                  "from": 1,
+                  "to": 2,
+                  "label": "pushes"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "Deep within the Earth"
+                },
+                {
+                  "atPercent": 30,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "draw",
+                  "narrationCue": "creates convection currents"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "move",
+                  "narrationCue": "pushes the crust above"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "the surface while cooler material"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "sinks back down creating a"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "cycle that pushes the crust"
+                }
+              ],
+              "interaction": {
+                "label": "Heat Intensity",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 1,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 5,
+                "unit": "units",
+                "lowState": "Slow drift",
+                "highState": "Rapid movement",
+                "prompt": "Adjust the heat to change the speed of mantle flow."
+              },
+              "interactionPrompt": "Adjust the heat to change the speed of mantle flow.",
+              "renderSpec": {
+                "domain": "geography",
+                "engine": "simulation",
+                "template": "process",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Plate Boundaries",
+              "objective": "Contrast divergent, convergent, and transform boundaries.",
+              "narration": "Plates interact at their edges. At divergent boundaries, they pull apart. At convergent boundaries, they collide. At transform boundaries, they slide past each other.",
+              "durationSeconds": 15,
+              "visualType": "comparison",
+              "visualTitle": "Types of Plate Boundaries",
+              "visualMetaphor": "Sliding puzzle pieces",
+              "motion": "transform",
+              "visualElements": [
+                {
+                  "label": "Divergent",
+                  "detail": "Plates moving away",
+                  "role": "process",
+                  "accent": "blue",
+                  "symbol": "arrow"
+                },
+                {
+                  "label": "Convergent",
+                  "detail": "Plates pushing together",
+                  "role": "process",
+                  "accent": "red",
+                  "symbol": "arrow"
+                },
+                {
+                  "label": "Transform",
+                  "detail": "Plates sliding sideways",
+                  "role": "process",
+                  "accent": "ochre",
+                  "symbol": "arrow"
+                }
+              ],
+              "connections": [],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "divergent boundaries"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 1,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "convergent boundaries"
+                },
+                {
+                  "atPercent": 80,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "transform boundaries"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "convergent boundaries they collide At"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "At transform boundaries they slide"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "slide past each other"
+                }
+              ],
+              "interaction": {
+                "label": "Boundary Type",
+                "targetIndex": 0,
+                "kind": "stepper",
+                "effect": "rotate",
+                "min": 0,
+                "max": 2,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "index",
+                "lowState": "Divergent",
+                "highState": "Transform",
+                "prompt": "Select a boundary type to see its movement."
+              },
+              "interactionPrompt": "Toggle through the boundary types to observe their unique motions.",
+              "renderSpec": {
+                "domain": "geography",
+                "engine": "illustration",
+                "template": "illustration",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "transcription",
+      "baseline": {
+        "ok": true,
+        "model": "gemini-3.1-flash-lite",
+        "error": null,
+        "text": "To understand DNA transcription, think of your DNA as a **master cookbook** kept in a library (the cell nucleus). You aren't allowed to take the cookbook out of the library, but you need to take a recipe to the kitchen to cook a meal.\n\n**Transcription** is the process of copying one specific recipe (a gene) onto a small, portable note card (an RNA molecule).\n\nHere is how that process works step-by-step:\n\n---\n\n### 1. The Template DNA (The Recipe)\nYour DNA is a long, double-stranded molecule. However, you only need to copy one specific \"recipe\" (a gene). The cell identifies the start of the gene, and the two strands of DNA \"unzip\" just like a zipper. \n\nOne of these strands acts as the **Template DNA**. It serves as the physical guide or \"mold\" that tells the cell exactly which building blocks to put into the new RNA copy.\n\n### 2. RNA Polymerase (The Scribe)\n**RNA Polymerase** is a specialized protein (an enzyme) that acts as the \"scribe.\" It moves along the template DNA strand, reading the genetic code one letter at a time. As it moves, it grabs free-floating building blocks from the cell and stitches them together to create a new strand of RNA.\n\n### 3. Complementary RNA Bases (The Translation)\nDNA and RNA use a \"language\" made of four chemical bases (letters). When the RNA polymerase reads a letter on the DNA, it adds the **complementary** (matching) base to the new RNA strand.\n\nThe matching rules are:\n*   If the DNA has a **G**, the RNA adds a **C**.\n*   If the DNA has a **C**, the RNA adds a **G**.\n*   If the DNA has a **T**, the RNA adds an **A**.\n*   **The Big Difference:** If the DNA has an **A**, the RNA adds a **U** (Uracil). *In RNA, there is no \"T\"—it uses \"U\" instead.*\n\nThink of it like a mirror image: if the DNA says \"A,\" the RNA scribe writes \"U.\"\n\n### 4. Termination (The End of the Note)\nThe RNA polymerase doesn't copy the entire DNA strand; it only copies the specific gene it was sent to find. When it reaches a specific sequence of DNA called a **\"terminator\"** (a chemical \"stop sign\"), the RNA polymerase knows it has reached the end of the recipe.\n\nIt stops copying, releases the newly formed RNA strand, and detaches from the DNA. The DNA zips back up, and the new RNA molecule (now called **mRNA**) floats away, ready to head out of the nucleus to the \"kitchen\" (the ribosome) to help build a protein.\n\n---\n\n### Summary Table\n| Component | What it does |\n| :--- | :--- |\n| **Template DNA** | The original instruction manual; the guide. |\n| **RNA Polymerase** | The scribe that builds the copy. |\n| **Complementary Bases** | The matching letters (A-U, T-A, C-G, G-C). |\n| **Termination** | The \"stop sign\" that ends the copying process. |",
+        "keywordCoverage": 1,
+        "runnable": false,
+        "latencyMs": 5539
+      },
+      "ocular": {
+        "ok": true,
+        "keywordCoverage": 1,
+        "structureChecks": {
+          "atLeastTwoScenes": true,
+          "narration": true,
+          "visualObjects": true,
+          "animationTimeline": true,
+          "directManipulation": true,
+          "rendererPlan": true
+        },
+        "runnable": true,
+        "sceneCount": 3,
+        "latencyMs": 7208,
+        "generation": "agent",
+        "lesson": {
+          "title": "DNA Transcription Process",
+          "summary": "A step-by-step breakdown of how DNA is transcribed into mRNA by RNA polymerase.",
+          "scenes": [
+            {
+              "title": "Initiation at the Promoter",
+              "objective": "Introduce the DNA template and the binding of RNA polymerase.",
+              "narration": "Transcription begins when the enzyme RNA polymerase identifies a specific start sequence on the DNA strand. It binds firmly to the template to prepare for synthesis.",
+              "durationSeconds": 8,
+              "visualType": "process",
+              "visualTitle": "Initiation",
+              "visualMetaphor": "A sliding lock on a rail",
+              "motion": "reveal",
+              "visualElements": [
+                {
+                  "label": "DNA Template",
+                  "detail": "The double stranded genetic code",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "stack"
+                },
+                {
+                  "label": "RNA Polymerase",
+                  "detail": "The protein machine that builds RNA",
+                  "role": "process",
+                  "accent": "blue",
+                  "symbol": "gear"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "binds"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 20,
+                  "targetIndex": 0,
+                  "relatedIndex": -1,
+                  "action": "draw",
+                  "narrationCue": "Transcription begins"
+                },
+                {
+                  "atPercent": 60,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "reveal",
+                  "narrationCue": "RNA polymerase identifies a specific start sequence"
+                },
+                {
+                  "atPercent": 64,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "connect",
+                  "narrationCue": "the DNA strand It binds"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "transform",
+                  "narrationCue": "to the template to prepare"
+                }
+              ],
+              "interaction": {
+                "label": "Binding Affinity",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "intensity",
+                "min": 1,
+                "max": 10,
+                "step": 1,
+                "defaultValue": 5,
+                "unit": "strength",
+                "lowState": "Loose",
+                "highState": "Tight",
+                "prompt": "Adjust the binding strength of the polymerase."
+              },
+              "interactionPrompt": "Adjust the binding strength of the polymerase.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "illustration",
+                "template": "illustration",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Elongation of RNA",
+              "objective": "Show the addition of complementary RNA bases.",
+              "narration": "As the enzyme moves along the DNA, it unwinds the helix. It adds complementary RNA bases one by one to create a growing messenger RNA strand.",
+              "durationSeconds": 10,
+              "visualType": "process",
+              "visualTitle": "Elongation",
+              "visualMetaphor": "A zipper opening and closing",
+              "motion": "flow",
+              "visualElements": [
+                {
+                  "label": "DNA Strand",
+                  "detail": "The template being read",
+                  "role": "source",
+                  "accent": "ink",
+                  "symbol": "path"
+                },
+                {
+                  "label": "RNA Polymerase",
+                  "detail": "Moving along the strand",
+                  "role": "process",
+                  "accent": "blue",
+                  "symbol": "gear"
+                },
+                {
+                  "label": "RNA Strand",
+                  "detail": "The newly synthesized molecule",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "wave"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 2,
+                  "label": "synthesizes"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 10,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "move",
+                  "narrationCue": "As the enzyme moves along the DNA"
+                },
+                {
+                  "atPercent": 50,
+                  "targetIndex": 2,
+                  "relatedIndex": 1,
+                  "action": "accumulate",
+                  "narrationCue": "It adds complementary RNA bases"
+                },
+                {
+                  "atPercent": 42,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "connect",
+                  "narrationCue": "unwinds the helix It adds"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "complementary RNA bases one by"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "by one to create a"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "a growing messenger RNA strand"
+                }
+              ],
+              "interaction": {
+                "label": "Synthesis Speed",
+                "targetIndex": 1,
+                "kind": "slider",
+                "effect": "flow",
+                "min": 1,
+                "max": 5,
+                "step": 1,
+                "defaultValue": 2,
+                "unit": "bases/sec",
+                "lowState": "Slow",
+                "highState": "Fast",
+                "prompt": "Control the speed of transcription."
+              },
+              "interactionPrompt": "Control the speed of transcription.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "illustration",
+                "template": "illustration",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            },
+            {
+              "title": "Termination",
+              "objective": "Explain the release of the RNA and enzyme.",
+              "narration": "When the polymerase reaches the termination sequence, the process stops. The RNA strand is released, and the enzyme detaches from the DNA template.",
+              "durationSeconds": 8,
+              "visualType": "process",
+              "visualTitle": "Termination",
+              "visualMetaphor": "A train arriving at a station",
+              "motion": "transform",
+              "visualElements": [
+                {
+                  "label": "DNA Template",
+                  "detail": "The original strand",
+                  "role": "context",
+                  "accent": "ink",
+                  "symbol": "path"
+                },
+                {
+                  "label": "RNA Polymerase",
+                  "detail": "Detaching from the DNA",
+                  "role": "process",
+                  "accent": "red",
+                  "symbol": "gear"
+                },
+                {
+                  "label": "mRNA",
+                  "detail": "The final transcript",
+                  "role": "result",
+                  "accent": "olive",
+                  "symbol": "wave"
+                }
+              ],
+              "connections": [
+                {
+                  "from": 1,
+                  "to": 0,
+                  "label": "detaches"
+                }
+              ],
+              "animationBeats": [
+                {
+                  "atPercent": 30,
+                  "targetIndex": 1,
+                  "relatedIndex": 0,
+                  "action": "remove",
+                  "narrationCue": "the enzyme detaches"
+                },
+                {
+                  "atPercent": 70,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "The RNA strand is released"
+                },
+                {
+                  "atPercent": 42,
+                  "targetIndex": 2,
+                  "relatedIndex": 0,
+                  "action": "connect",
+                  "narrationCue": "the process stops The RNA"
+                },
+                {
+                  "atPercent": 58,
+                  "targetIndex": 0,
+                  "relatedIndex": 1,
+                  "action": "transform",
+                  "narrationCue": "RNA strand is released and"
+                },
+                {
+                  "atPercent": 75,
+                  "targetIndex": 1,
+                  "relatedIndex": 2,
+                  "action": "compare",
+                  "narrationCue": "and the enzyme detaches from"
+                },
+                {
+                  "atPercent": 92,
+                  "targetIndex": 2,
+                  "relatedIndex": -1,
+                  "action": "reveal",
+                  "narrationCue": "from the DNA template"
+                }
+              ],
+              "interaction": {
+                "label": "Termination Signal",
+                "targetIndex": 1,
+                "kind": "toggle",
+                "effect": "intensity",
+                "min": 0,
+                "max": 1,
+                "step": 1,
+                "defaultValue": 0,
+                "unit": "state",
+                "lowState": "Active",
+                "highState": "Terminated",
+                "prompt": "Trigger the termination sequence."
+              },
+              "interactionPrompt": "Trigger the termination sequence.",
+              "renderSpec": {
+                "domain": "biology",
+                "engine": "illustration",
+                "template": "illustration",
+                "expression": "0",
+                "secondaryExpression": "0",
+                "parameter": "0",
+                "parameterMin": 0,
+                "parameterMax": 0,
+                "xMin": 0,
+                "xMax": 0,
+                "yMin": 0,
+                "yMax": 0,
+                "moleculeSmiles": "",
+                "latitude": 0,
+                "longitude": 0
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

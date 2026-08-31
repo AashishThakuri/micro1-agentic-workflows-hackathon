@@ -59,7 +59,12 @@ async function generateWithFallback(apiKey: string, contents: Array<Record<strin
       const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) continue;
       try {
-        return parseGeminiJson<unknown>(text);
+        const lesson = parseGeminiJson<{ scenes?: unknown }>(text);
+        if (!Array.isArray(lesson?.scenes) || lesson.scenes.length < 2) {
+          console.error("Gemini lesson did not satisfy the minimum two-scene contract", model);
+          continue;
+        }
+        return lesson;
       } catch (error) {
         console.error("Gemini lesson JSON was invalid", model, error);
         continue;
@@ -187,6 +192,49 @@ function buildLocalLesson(source: string) {
         interactionPrompt: "Change the driving quantity and compare the result.",
         renderSpec,
       },
+      {
+        title: "Test the boundary",
+        objective: `Compare when the core mechanism of ${topic} applies and when it changes.`,
+        narration: `Now test the model instead of only watching it. Compare the ordinary case with a boundary case. Keep the cause visible, change one condition, and observe whether the same result still follows or whether the explanation needs a different rule.`,
+        durationSeconds: 28,
+        visualType: "comparison",
+        visualTitle: `Boundary check for ${topic}`,
+        visualMetaphor: "Two versions of the same system reveal which condition controls the outcome.",
+        motion: "compare",
+        visualElements: [
+          { label: "ordinary case", detail: "The mechanism under its expected condition", role: "source", accent: "blue", symbol: "node" },
+          { label: "changed condition", detail: "One boundary or assumption is varied", role: "process", accent: "ochre", symbol: "slider" },
+          { label: "observed outcome", detail: "The resulting difference tests the explanation", role: "result", accent: "red", symbol: "graph" },
+        ],
+        connections: [
+          { from: 0, to: 2, label: "normally produces" },
+          { from: 1, to: 2, label: "changes" },
+        ],
+        animationBeats: [
+          { atPercent: 5, targetIndex: 0, relatedIndex: -1, action: "draw", narrationCue: "test the model" },
+          { atPercent: 22, targetIndex: 0, relatedIndex: 2, action: "connect", narrationCue: "ordinary case" },
+          { atPercent: 40, targetIndex: 1, relatedIndex: 0, action: "compare", narrationCue: "boundary case" },
+          { atPercent: 58, targetIndex: 1, relatedIndex: 2, action: "transform", narrationCue: "change one condition" },
+          { atPercent: 76, targetIndex: 2, relatedIndex: -1, action: "reveal", narrationCue: "observe" },
+          { atPercent: 92, targetIndex: 2, relatedIndex: 0, action: "compare", narrationCue: "different rule" },
+        ],
+        interaction: {
+          label: "boundary condition",
+          targetIndex: 1,
+          kind: "toggle",
+          effect: "intensity",
+          min: 0,
+          max: 1,
+          step: 1,
+          defaultValue: 0,
+          unit: "state",
+          lowState: "The ordinary condition holds.",
+          highState: "The boundary condition changes the outcome.",
+          prompt: "Toggle the condition and compare the outcome.",
+        },
+        interactionPrompt: "Change one assumption and test whether the explanation still holds.",
+        renderSpec,
+      },
     ],
   };
 }
@@ -214,7 +262,7 @@ export async function POST(request: Request) {
       text: [
         "You are the lesson director for Ocular, an interactive visual learning studio.",
         "Turn the source into a complete scene-by-scene visual lesson, not a fixed-length summary.",
-        "The lesson length must adapt to the source. Use as many scenes as the subject genuinely needs: short topics may need only a few; dense notes or PDFs should receive substantially more. Never pad and never omit an essential concept just to fit a preset duration.",
+        "The lesson length must adapt to the source. Every lesson needs at least two complementary scenes: first establish the core mechanism, then test, compare, apply, or expose its boundary. Dense notes or PDFs should receive substantially more. Never omit an essential concept just to fit a preset duration.",
         "Each scene teaches exactly one idea and can stand alone when a learner later asks AI to revise it.",
         "Narration must sound natural when spoken aloud. Never use an em dash or en dash. Use commas and short sentences. Set a realistic durationSeconds for each scene based on its narration and interaction.",
         "Build a unique visual blueprint for every scene. visualElements are the selectable objects, ideas, evidence, or actions that make the explanation work; use exactly as many as clarity requires.",
