@@ -6,6 +6,7 @@ export const ocularVisualLanguage = [
   "Keep the canvas calm: off-white paper, black ink, generous negative space, and only restrained ochre, dusty red, muted blue, or olive accents. Never neon, glossy, cinematic, or effects-heavy.",
   "Labels must be one to four words, large, and concrete. Never put explanatory paragraphs, scene numbers, UI instructions, or example prose such as 'User types Hello' on the canvas.",
   "Every element symbol is a short concrete drawable noun such as person, book, cell, molecule, planet, gear, tree, clock, circle, square, triangle, stack, arrow, orbit, wave, bars, or node. Never use emoji or Unicode pictograms.",
+  "Never fetch an internet image. Every visual must be generated locally by the matching subject renderer. For a real organism, organ, person, place, artifact, machine, specimen, or physical object, use concrete drawable nouns and the illustration renderer so it constructs a recognizable animated object from local primitives.",
   "Choose any composition the topic needs. The available composition names are rendering hints, not content limits.",
   "Motion must explain something: flow, reveal, pulse, orbit, or transformation. The object itself must move, split, connect, rotate, accumulate, or change state as it is discussed.",
   "Every scene needs one direct manipulation whose value changes a meaningful causal property. It must teach a consequence, not merely change decoration. Examples include angle, count, rate, force, flow, balance, scale, order, or intensity.",
@@ -51,6 +52,33 @@ export const interactionProperties = {
   prompt: { type: "STRING" },
 };
 
+export const renderSpecProperties = {
+  domain: {
+    type: "STRING",
+    enum: ["mathematics", "physics", "chemistry", "biology", "astronomy", "geography", "computing", "economics", "history", "general"],
+  },
+  engine: {
+    type: "STRING",
+    enum: ["manim", "scientific", "network", "simulation", "molecule", "biology", "astronomy", "map", "illustration", "sketch"],
+  },
+  template: {
+    type: "STRING",
+    enum: ["function_graph", "derivative", "integral", "differential_equation", "distribution", "vector_field", "geometry", "matrix", "scientific_plot", "network", "process", "molecule", "phylogeny", "cell_division", "orbit", "map", "timeline", "illustration", "concept"],
+  },
+  expression: { type: "STRING" },
+  secondaryExpression: { type: "STRING" },
+  parameter: { type: "STRING" },
+  parameterMin: { type: "NUMBER" },
+  parameterMax: { type: "NUMBER" },
+  xMin: { type: "NUMBER" },
+  xMax: { type: "NUMBER" },
+  yMin: { type: "NUMBER" },
+  yMax: { type: "NUMBER" },
+  moleculeSmiles: { type: "STRING" },
+  latitude: { type: "NUMBER" },
+  longitude: { type: "NUMBER" },
+};
+
 export const sceneProperties = {
   title: { type: "STRING" },
   objective: { type: "STRING" },
@@ -93,6 +121,11 @@ export const sceneProperties = {
     required: Object.keys(interactionProperties),
   },
   interactionPrompt: { type: "STRING" },
+  renderSpec: {
+    type: "OBJECT",
+    properties: renderSpecProperties,
+    required: Object.keys(renderSpecProperties),
+  },
 };
 
 export function removeNarrationDashes<T>(value: T): T {

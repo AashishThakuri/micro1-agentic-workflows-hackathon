@@ -18,6 +18,11 @@
 
 # Local caches and logs
 **/.npm-cache/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+backend/generated/
+backend/.renderer-cache/
 **/*.log
 **/.DS_Store
 

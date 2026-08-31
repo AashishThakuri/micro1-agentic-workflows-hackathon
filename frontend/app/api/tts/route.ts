@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   const model = process.env.GEMINI_TTS_MODEL || "gemini-3.1-flash-tts-preview";
   const task = narrationQueue.then(async () => {
     try {
-      for (let attempt = 0; attempt < 3; attempt += 1) {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
         await paceGeminiRequest();
         const response = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -122,8 +122,8 @@ export async function POST(request: Request) {
         console.error("Gemini narration request failed", model, response.status, errorBody.slice(0, 500));
         const retryable = response.status === 429 || response.status === 503;
         const retryAfter = response.status === 429 ? retryDelaySeconds(response, errorBody) : 7;
-        if (retryable && attempt < 2) {
-          await wait(Math.min(59, retryAfter) * 1000);
+        if (retryable && attempt === 0 && retryAfter <= 15) {
+          await wait(retryAfter * 1000);
           continue;
         }
         if (response.status === 429) {

@@ -1,4 +1,5 @@
 import { ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "../visual-language";
+import { GEMINI_TEXT_MODELS, parseGeminiJson } from "../gemini-json";
 
 type VisualElement = {
   label: string;
@@ -69,32 +70,46 @@ export async function POST(request: Request) {
     "Keep narration free of em dashes and en dashes. Use commas and short sentences.",
     "Create a meaningful direct manipulation that lets the learner change the mechanism and immediately see its consequence.",
     "Synchronize a topic-appropriate visual action to every meaningful narrated phrase. The action grammar is general and must be chosen from the learner's actual subject, never copied from an example topic.",
+    "Rebuild renderSpec as a safe structured renderer plan. For every branch of mathematics use engine manim and the precise mathematical template. Use scientific for measured physical systems, network for connected systems, simulation for discrete processes, molecule for chemistry, biology with phylogeny for evolutionary branching, biology with cell_division for mitosis or meiosis, astronomy for orbital relationships, map for geography, and the local illustration renderer for real organisms, anatomy, medicine, people, places, artworks, artifacts, specimens, machines, and other concrete subjects. Never use internet images. Use sketch only when no quantitative, biological, geographic, or locally generated subject renderer fits.",
+    "renderSpec expressions contain compact mathematics only, never prose or executable code.",
     ocularVisualLanguage,
   ].join("\n");
 
-  for (const model of ["gemini-3.7-flash", "gemini-3.5-flash", "gemini-2.5-flash"]) {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.35,
-            responseMimeType: "application/json",
-            responseSchema: sceneSchema,
-          },
-        }),
-      },
-    );
+  for (const model of GEMINI_TEXT_MODELS) {
+    let response: Response;
+    try {
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.35,
+              responseMimeType: "application/json",
+              responseSchema: sceneSchema,
+            },
+          }),
+          signal: AbortSignal.timeout(45_000),
+        },
+      );
+    } catch (error) {
+      console.error("Gemini scene refinement did not complete", model, error);
+      continue;
+    }
 
     if (response.ok) {
       const payload = (await response.json()) as {
         candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
       };
       const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) return Response.json(removeNarrationDashes(JSON.parse(text)));
+      if (!text) continue;
+      try {
+        return Response.json(removeNarrationDashes(parseGeminiJson<Scene>(text)));
+      } catch (error) {
+        console.error("Gemini refinement JSON was invalid", model, error);
+      }
     } else if (response.status !== 429 && response.status !== 503) {
       break;
     }

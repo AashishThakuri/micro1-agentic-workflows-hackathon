@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Ocular — Learn in motion",
   description:
     "Turn any topic, note, or PDF into a living visual lesson you can question and reshape.",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

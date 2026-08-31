@@ -60,9 +60,10 @@ export default defineConfig(async ({ mode }) => {
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
         config: {
           ...localBindingConfig,
-          vars: backendEnv.GEMINI_API_KEY
-            ? { GEMINI_API_KEY: backendEnv.GEMINI_API_KEY }
-            : {},
+          vars: {
+            ...(backendEnv.GEMINI_API_KEY ? { GEMINI_API_KEY: backendEnv.GEMINI_API_KEY } : {}),
+            OCULAR_RENDERER_URL: backendEnv.OCULAR_RENDERER_URL || 'http://127.0.0.1:8789',
+          },
         },
       }),
     ],

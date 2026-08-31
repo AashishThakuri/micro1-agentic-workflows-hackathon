@@ -3144,23 +3144,6 @@ body:has(.workbench-shell) {
   inset: 50% 7% auto 7%;
 }
 
-.direct-manipulation-bar {
-  display: grid;
-  grid-template-columns: minmax(9rem, 0.42fr) minmax(12rem, 1.58fr);
-  gap: 1.2rem;
-  align-items: center;
-  min-height: 3.8rem;
-  padding: 0.55rem clamp(1rem, 2.2vw, 2rem);
-  border-bottom: 1.5px solid var(--ink);
-  background: var(--paper);
-}
-
-.direct-manipulation-bar > div { display: flex; gap: 0.7rem; align-items: baseline; }
-.direct-manipulation-bar strong { font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; }
-.direct-manipulation-bar output { font-family: "Amulya", var(--font-body), sans-serif; font-size: 1rem; }
-.direct-manipulation-bar input { width: 100%; accent-color: var(--ink); }
-.direct-manipulation-bar > button { min-height: 2.2rem; border: 1px solid var(--ink); color: var(--paper); background: var(--ink); cursor: pointer; }
-
 @keyframes focus-breathe { to { inset: 2% 0; transform: rotate(1.5deg); } }
 @keyframes semantic-draw { from { opacity: 0; clip-path: inset(0 100% 0 0); transform: scale(0.82); } to { opacity: 1; clip-path: inset(0); transform: scale(1); } }
 @keyframes semantic-move { to { transform: translate(1.1rem, -0.4rem); } }
@@ -3184,7 +3167,6 @@ body:has(.workbench-shell) {
   .video-panel-heading { min-height: 4rem; }
   .scene-items button { min-height: 9rem; }
   .scene-item-symbol { width: clamp(4.5rem, 15vw, 7rem); }
-  .direct-manipulation-bar { grid-template-columns: 1fr; gap: 0.35rem; }
 }
 
 @media (max-width: 36rem) {
@@ -3194,5 +3176,275 @@ body:has(.workbench-shell) {
   .scene-items button { min-height: 6.5rem; }
   .scene-item-symbol { width: 4rem; }
   .scene-items button strong { font-size: 0.88rem; }
-  .direct-manipulation-bar { padding-inline: 0.8rem; }
+}
+
+/* Semantic lesson renderer: real graphs and relationship motion, not slide decoration. */
+.scene-sketch {
+  grid-template-rows: minmax(12rem, 1fr) auto;
+  align-content: stretch;
+}
+
+.semantic-diagram {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 58rem);
+  min-height: 13rem;
+  margin-inline: auto;
+}
+
+.precision-animation-shell {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 68rem);
+  height: 100%;
+  max-height: 24rem;
+  aspect-ratio: 16 / 9;
+  margin-inline: auto;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.precision-animation-fallback,
+.precision-animation {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.precision-animation-fallback {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  opacity: 1;
+  transition: opacity 180ms linear;
+}
+
+.precision-animation-fallback > .semantic-diagram { height: 100%; }
+
+.precision-animation {
+  z-index: 2;
+  display: block;
+  border: 0;
+  outline: 0;
+  opacity: 0;
+  background: var(--paper);
+  object-fit: contain;
+  transition: opacity 180ms linear;
+}
+
+.precision-animation-shell.is-ready .precision-animation { opacity: 1; }
+.precision-animation-shell.is-ready .precision-animation-fallback { opacity: 0; }
+
+.video-interaction-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.video-comment-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+.video-comment-surface:focus-visible { outline: 2px solid var(--ink); outline-offset: -0.25rem; }
+
+.video-interaction-hint {
+  position: absolute;
+  top: 0.55rem;
+  left: 50%;
+  padding: 0.28rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--ink) 58%, transparent);
+  color: var(--paper);
+  background: color-mix(in srgb, var(--ink) 84%, transparent);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 160ms ease;
+}
+
+.video-comment-surface:hover .video-interaction-hint { opacity: 0.35; }
+
+.video-comment-pin {
+  position: absolute;
+  z-index: 3;
+  width: 1.1rem;
+  height: 1.1rem;
+  pointer-events: auto;
+  transform: translate(-0.55rem, -0.55rem);
+}
+
+.video-comment-pin > i {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid var(--paper);
+  border-radius: 50% 50% 50% 0;
+  background: var(--pink);
+  box-shadow: 0 0 0 2px var(--ink);
+  transform: rotate(-45deg);
+}
+
+.video-comment-pin > div {
+  position: absolute;
+  top: 1rem;
+  left: 0.9rem;
+  display: grid;
+  width: min(19rem, 42vw);
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 0.35rem 0.35rem 0 rgb(23 23 22 / 18%);
+  cursor: text;
+}
+
+.video-comment-pin.opens-left > div { right: 0.9rem; left: auto; }
+.video-comment-pin.opens-up > div { top: auto; bottom: 1rem; }
+.video-comment-pin strong { overflow: hidden; font-size: 0.54rem; letter-spacing: 0.05em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.video-comment-pin input { width: 100%; padding: 0.35rem 0; border: 0; border-bottom: 1px solid var(--ink); outline: 0; color: var(--ink); background: transparent; font-family: "Amulya", var(--font-body), sans-serif; font-size: 0.78rem; }
+
+.video-direct-control {
+  position: absolute;
+  z-index: 2;
+  right: 0.65rem;
+  bottom: 0.55rem;
+  display: grid;
+  min-width: min(19rem, 46vw);
+  grid-template-columns: auto minmax(6rem, 1fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.42rem 0.55rem;
+  border: 1px solid var(--ink);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  cursor: default;
+  pointer-events: auto;
+}
+
+.video-direct-control label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.video-direct-control input { width: 100%; accent-color: var(--ink); cursor: ew-resize; }
+.video-direct-control output { min-width: 2.8rem; font-size: 0.66rem; text-align: right; }
+
+.semantic-diagram svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 17rem;
+  overflow: visible;
+}
+
+.semantic-diagram text {
+  fill: var(--ink);
+  font-family: "Amulya", var(--font-body), sans-serif;
+  font-size: 18px;
+}
+
+.diagram-axis {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.62;
+}
+
+.diagram-line,
+.diagram-edge {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - var(--diagram-progress));
+  transition: stroke-dashoffset 240ms linear;
+}
+
+.diagram-fill {
+  fill: color-mix(in srgb, var(--yellow) 38%, transparent);
+  opacity: calc(0.22 + var(--diagram-progress) * 0.58);
+  transform: scaleY(var(--diagram-progress));
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transition: opacity 240ms linear, transform 240ms linear;
+}
+
+.distribution-dot,
+.graph-point {
+  fill: var(--pink);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  opacity: clamp(0, calc(var(--diagram-progress) * 4 - var(--dot-index, 0) * 0.12), 1);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 220ms linear;
+}
+
+.semantic-diagram.is-running .distribution-dot {
+  animation: observation-settle 1.35s ease-in-out infinite alternate;
+  animation-delay: calc(var(--dot-index) * -80ms);
+}
+
+.diagram-node circle {
+  fill: color-mix(in srgb, var(--yellow) 56%, var(--paper));
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.diagram-node:nth-of-type(2n) circle { fill: color-mix(in srgb, var(--pink) 48%, var(--paper)); }
+.diagram-node { opacity: clamp(0.12, calc(var(--diagram-progress) * 5 - var(--node-index) * 0.5), 1); transition: opacity 240ms linear; }
+.diagram-edge { stroke-width: 3; opacity: 0.72; }
+.semantic-diagram.is-running .diagram-edge { animation: connection-breathe 1.1s ease-in-out infinite alternate; animation-delay: calc(var(--edge-index) * -120ms); }
+
+.semantic-diagram + .scene-items {
+  z-index: 2;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  width: min(100%, 54rem);
+  margin-inline: auto;
+}
+
+.semantic-diagram + .scene-items button {
+  min-height: 5.4rem;
+  padding: 0.25rem;
+}
+
+.semantic-diagram + .scene-items .scene-item-symbol { width: clamp(3rem, 5vw, 4.4rem); }
+
+.semantic-diagram + .scene-items button strong { font-size: clamp(0.92rem, 1.35vw, 1.25rem); }
+
+.shape-curve > i {
+  width: 88%;
+  height: 70%;
+  margin: auto;
+  border-top: 3px solid var(--ink);
+  border-radius: 50% 50% 0 0;
+  transform: translateY(24%);
+}
+
+@keyframes observation-settle { to { transform: translateY(0.35rem); } }
+@keyframes connection-breathe { to { stroke-width: 5; opacity: 1; } }
+
+@media (max-width: 52rem) {
+  .semantic-diagram { min-height: 11rem; }
+  .precision-animation-shell { max-height: 20rem; }
+}
+
+@media (max-width: 36rem) {
+  .scene-sketch { grid-template-rows: minmax(10rem, 1fr) auto; }
+  .semantic-diagram text { font-size: 24px; }
+  .semantic-diagram + .scene-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .semantic-diagram + .scene-items button:nth-child(n + 3) { display: none; }
+  .video-comment-pin > div { width: min(15rem, 72vw); }
+  .video-direct-control { right: 0.35rem; bottom: 0.35rem; left: 0.35rem; min-width: 0; }
+  .video-direct-control label { overflow: hidden; max-width: 6rem; text-overflow: ellipsis; white-space: nowrap; }
 }

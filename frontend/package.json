@@ -6,7 +6,9 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "vinext dev",
+    "dev:renderer": "uv run --project ../backend python ../backend/server.py",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json",
     "lint": "oxlint",
