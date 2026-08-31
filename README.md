@@ -343,4 +343,4 @@ The fix was not merely a larger prompt. Ocular moved to typed plans, determinist
 
 ## License
 
-Hackathon submission by Aashish Thakuri. Third-party dependencies retain their respective licenses.
+Hackathon submission by Aashish Thakuri. 
