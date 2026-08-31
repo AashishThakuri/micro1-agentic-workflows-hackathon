@@ -18,14 +18,6 @@ Turn a topic, rough notes, or a PDF into a narrated visual lesson a learner can 
 
 ![Ocular landing page](docs/assets/ocular-landing.png)
 
-## A visual lesson, generated inside Ocular
-
-This transfer-learning scene was generated from the learner's prompt, routed through Ocular's verified rendering workflow, and displayed inside the interactive lesson studio. It shows reusable visual features from a pretrained network being transferred to a plant-disease classifier built from a small labeled dataset.
-
-![Transfer-learning lesson generated inside Ocular](docs/assets/ocular-transfer-learning-demo.png)
-
-Most AI tutors return a fluent paragraph. General-purpose video models can make moving pixels, but an educational product needs something harder: an explanation whose objects, relationships, timing, narration, and interaction stay correct. Ocular builds that executable explanation.
-
 ## Ocular in 30 seconds
 
 | Question | Answer |
