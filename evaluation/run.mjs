@@ -16,8 +16,12 @@ const env = Object.fromEntries(
       return [line.slice(0, separator).trim(), line.slice(separator + 1).trim()];
     }),
 );
-const geminiApiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
-const openAiApiKey = process.env.OPENAI_API_KEY || env.OPENAI_API_KEY;
+const configuredKey = (value) => {
+  const key = String(value || "").trim();
+  return key && !/^your_/i.test(key) ? key : undefined;
+};
+const geminiApiKey = configuredKey(process.env.GEMINI_API_KEY || env.GEMINI_API_KEY);
+const openAiApiKey = configuredKey(process.env.OPENAI_API_KEY || env.OPENAI_API_KEY);
 const requestedProvider = (process.env.OCULAR_AI_PROVIDER || env.OCULAR_AI_PROVIDER || "auto").toLowerCase();
 const evaluationProvider = requestedProvider === "openai"
   ? "openai"
@@ -48,14 +52,44 @@ if (evaluationProvider === "gemini" && !geminiApiKey) {
 
 const baselineModels = ["gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"];
 const openAiModel = process.env.OPENAI_MODEL || env.OPENAI_MODEL || "gpt-5.2";
+const baselinePrompt = (topic) => [
+  "Create a complete beginner-friendly visual lesson for the following topic.",
+  "The final response itself should help the learner see the mechanism unfold, follow narration, manipulate the explanation, and ask a follow-up question.",
+  "Use only this one direct response. Do not call tools, use external assets, or rely on a separate application.",
+  "Return the best complete artifact you can.",
+  `Topic: ${topic}`,
+].join("\n");
+
+const modelPricesPerMillionTokens = {
+  "gemini-3.1-flash-lite": { input: 0.25, output: 1.5 },
+};
 
 function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function keywordCoverage(text, keywords) {
-  const normalized = text.toLowerCase();
+  const normalized = String(text || "").toLowerCase();
   return keywords.filter((keyword) => normalized.includes(keyword.toLowerCase())).length / keywords.length;
+}
+
+function estimatePlanningCostUsd(model, usage) {
+  const price = modelPricesPerMillionTokens[model];
+  if (!price || !usage) return null;
+  return Number((((usage.inputTokens || 0) * price.input + (usage.outputTokens || 0) * price.output) / 1_000_000).toFixed(6));
+}
+
+function parseDirectLesson(text) {
+  const clean = String(text || "").trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  const start = clean.indexOf("{");
+  const end = clean.lastIndexOf("}");
+  if (start < 0 || end <= start) return null;
+  try {
+    const candidate = JSON.parse(clean.slice(start, end + 1));
+    return Array.isArray(candidate?.scenes) ? candidate : null;
+  } catch {
+    return null;
+  }
 }
 
 async function directGeminiPrompt(topic) {
@@ -69,8 +103,8 @@ async function directGeminiPrompt(topic) {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": geminiApiKey },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: `Explain this clearly to a beginner: ${topic}` }] }],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 1200 },
+          contents: [{ role: "user", parts: [{ text: baselinePrompt(topic) }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 4096 },
         }),
         signal: AbortSignal.timeout(45000),
       },
@@ -79,7 +113,20 @@ async function directGeminiPrompt(topic) {
     if (response.ok) {
       const payload = await response.json();
       const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join(" ") || "";
-      return { ok: Boolean(text), text, latencyMs: Math.round(performance.now() - started), model };
+      const usage = {
+        inputTokens: payload.usageMetadata?.promptTokenCount || 0,
+        outputTokens: payload.usageMetadata?.candidatesTokenCount || 0,
+        totalTokens: payload.usageMetadata?.totalTokenCount || 0,
+      };
+      return {
+        ok: Boolean(text),
+        text,
+        lesson: parseDirectLesson(text),
+        usage,
+        estimatedCostUsd: estimatePlanningCostUsd(model, usage),
+        latencyMs: Math.round(performance.now() - started),
+        model,
+      };
     }
 
     lastError = `${model} returned ${response.status}`;
@@ -102,8 +149,8 @@ async function directOpenAiPrompt(topic) {
       },
       body: JSON.stringify({
         model: openAiModel,
-        input: `Explain this clearly to a beginner: ${topic}`,
-        max_output_tokens: 1200,
+        input: baselinePrompt(topic),
+        max_output_tokens: 4096,
         store: false,
       }),
       signal: AbortSignal.timeout(60000),
@@ -123,9 +170,17 @@ async function directOpenAiPrompt(topic) {
       .filter((item) => item.type === "output_text")
       .map((item) => item.text || "")
       .join("");
+    const usage = {
+      inputTokens: payload.usage?.input_tokens || 0,
+      outputTokens: payload.usage?.output_tokens || 0,
+      totalTokens: payload.usage?.total_tokens || 0,
+    };
     return {
       ok: Boolean(text),
       text,
+      lesson: parseDirectLesson(text),
+      usage,
+      estimatedCostUsd: estimatePlanningCostUsd(openAiModel, usage),
       latencyMs: Math.round(performance.now() - started),
       model: openAiModel,
     };
@@ -172,13 +227,21 @@ async function ocularLesson(topic) {
     signal: AbortSignal.timeout(90000),
   });
   const lesson = await response.json();
+  const usage = {
+    inputTokens: Number(response.headers.get("X-Ocular-Input-Tokens")) || 0,
+    outputTokens: Number(response.headers.get("X-Ocular-Output-Tokens")) || 0,
+    totalTokens: Number(response.headers.get("X-Ocular-Total-Tokens")) || 0,
+  };
+  const model = response.headers.get("X-Ocular-Model") || null;
   return {
     ok: response.ok,
     lesson,
     latencyMs: Math.round(performance.now() - started),
     generation: response.headers.get("X-Ocular-Generation") || "agent",
     provider: response.headers.get("X-Ocular-Provider") || evaluationProvider,
-    model: response.headers.get("X-Ocular-Model") || null,
+    model,
+    usage,
+    estimatedCostUsd: estimatePlanningCostUsd(model, usage),
   };
 }
 
@@ -188,6 +251,7 @@ for (const [index, evaluationCase] of cases.entries()) {
   const baseline = await directPrompt(evaluationCase.topic);
   await wait(6500);
   const solution = await ocularLesson(evaluationCase.topic);
+  const baselineInspected = inspectLesson(baseline.lesson, evaluationCase.keywords);
   const inspected = inspectLesson(solution.lesson, evaluationCase.keywords);
   results.push({
     id: evaluationCase.id,
@@ -196,8 +260,13 @@ for (const [index, evaluationCase] of cases.entries()) {
       model: baseline.model || null,
       error: baseline.error || null,
       text: baseline.text,
+      lesson: baseline.lesson,
       keywordCoverage: keywordCoverage(baseline.text, evaluationCase.keywords),
-      runnable: false,
+      structureChecks: baselineInspected.structureChecks,
+      runnable: baselineInspected.runnable,
+      sceneCount: baselineInspected.sceneCount,
+      usage: baseline.usage || { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      estimatedCostUsd: baseline.estimatedCostUsd ?? null,
       latencyMs: baseline.latencyMs,
     },
     ocular: {
@@ -207,6 +276,8 @@ for (const [index, evaluationCase] of cases.entries()) {
       generation: solution.generation,
       provider: solution.provider,
       model: solution.model,
+      usage: solution.usage,
+      estimatedCostUsd: solution.estimatedCostUsd,
       lesson: solution.lesson,
     },
   });
@@ -233,10 +304,12 @@ const summary = {
   baselineMedianLatencyMs: median(results.map((result) => result.baseline.latencyMs)),
   ocularMedianLatencyMs: median(results.map((result) => result.ocular.latencyMs)),
   fallbackCases: results.filter((result) => result.ocular.generation !== "agent").map((result) => result.id),
+  baselineEstimatedPlanningCostUsd: Number(results.reduce((sum, result) => sum + (result.baseline.estimatedCostUsd || 0), 0).toFixed(6)),
+  ocularEstimatedPlanningCostUsd: Number(results.reduce((sum, result) => sum + (result.ocular.estimatedCostUsd || 0), 0).toFixed(6)),
 };
 
 const artifact = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   generatedAt: new Date().toISOString(),
   codeCommit,
   command: outputPath
@@ -258,6 +331,11 @@ const artifact = {
       "directManipulation",
       "rendererPlan",
     ],
+  },
+  baseline: {
+    task: "Create the same learner-facing visual lesson as Ocular",
+    resources: "One direct model response with no schema, tools, renderer, application runtime, verification, memory, or clarification agent",
+    promptTemplate: baselinePrompt("<case>"),
   },
   summary,
   results,

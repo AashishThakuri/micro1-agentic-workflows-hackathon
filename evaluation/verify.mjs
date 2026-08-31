@@ -37,11 +37,14 @@ const caseById = new Map(cases.map((item) => [item.id, item]));
 const recomputed = artifact.results.map((result) => {
   const evaluationCase = caseById.get(result.id);
   if (!evaluationCase) throw new Error(`Unknown evaluation case: ${result.id}`);
+  const baselineInspected = inspectLesson(result.baseline.lesson);
   const inspected = inspectLesson(result.ocular.lesson);
   return {
     id: result.id,
     baselineKeywordCoverage: keywordCoverage(result.baseline.text, evaluationCase.keywords),
     ocularKeywordCoverage: keywordCoverage(JSON.stringify(result.ocular.lesson), evaluationCase.keywords),
+    baselineRunnable: baselineInspected.runnable,
+    baselineStructureChecks: baselineInspected.structureChecks,
     ocularRunnable: inspected.runnable,
     structureChecks: inspected.structureChecks,
   };
@@ -57,7 +60,7 @@ const median = (values) => {
 };
 const verified = {
   cases: recomputed.length,
-  baselineRunnable: 0,
+  baselineRunnable: recomputed.filter((result) => result.baselineRunnable).length,
   ocularRunnable: recomputed.filter((result) => result.ocularRunnable).length,
   baselineKeywordCoveragePercent: average(recomputed.map((result) => result.baselineKeywordCoverage * 100)),
   ocularKeywordCoveragePercent: average(recomputed.map((result) => result.ocularKeywordCoverage * 100)),
@@ -66,6 +69,8 @@ const verified = {
   fallbackCases: artifact.results
     .filter((result) => result.ocular.generation !== "agent")
     .map((result) => result.id),
+  baselineEstimatedPlanningCostUsd: Number(artifact.results.reduce((sum, result) => sum + (result.baseline.estimatedCostUsd || 0), 0).toFixed(6)),
+  ocularEstimatedPlanningCostUsd: Number(artifact.results.reduce((sum, result) => sum + (result.ocular.estimatedCostUsd || 0), 0).toFixed(6)),
 };
 const expected = artifact.summary;
 const mismatches = Object.entries(verified).filter(

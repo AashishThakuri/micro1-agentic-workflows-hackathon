@@ -451,6 +451,9 @@ export async function POST(request: Request) {
           'X-Ocular-Generation': 'agent',
           'X-Ocular-Provider': result.provider,
           'X-Ocular-Model': result.model,
+          'X-Ocular-Input-Tokens': String(result.usage.inputTokens),
+          'X-Ocular-Output-Tokens': String(result.usage.outputTokens),
+          'X-Ocular-Total-Tokens': String(result.usage.totalTokens),
         },
       },
     );
