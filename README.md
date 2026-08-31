@@ -375,6 +375,4 @@ The fix was not merely a larger prompt. Ocular moved to typed plans, determinist
 
 > **Hot take:** do not ask an educational agent to be the illustrator, animator, narrator, and verifier at once. Let the model decide what must be taught, then make specialized deterministic tools execute and verify the plan. Constraint is what makes the creativity dependable.
 
-## License
-
-Copyright 2026 Aashish Thakuri. All rights reserved. The repository is available to hackathon judges for review and reproduction of the submitted result. Third-party packages retain their own licenses; the principal dependencies and lockfiles are documented in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Created by Aashish Thakuri 
