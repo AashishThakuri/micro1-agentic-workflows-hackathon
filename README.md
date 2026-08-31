@@ -31,7 +31,21 @@ Turn a topic, rough notes, or a PDF into a narrated visual lesson a learner can 
 
 ## Problem & user value
 
-### Problem 1: generative video is the wrong primitive for on-demand teaching
+### Problem 1: text alone does not make every mechanism understandable
+
+This is not a claim that every learner needs the same format. It is a claim that some ideas are inherently easier to understand when change, space, scale, flow, and cause are shown instead of merely described.
+
+| Research signal | Why it matters |
+| --- | --- |
+| UNESCO reports that **57% of children worldwide lack basic skills**. ([UNESCO, 2025](https://www.unesco.org/en/articles/what-we-stand-lose-costs-children-and-youth-not-learning-2030)) | The global learning problem is not simply access to more text; many learners are not reaching foundational understanding. |
+| UNESCO reports that **739 million adults** still lack basic literacy skills. ([UNESCO literacy data, 2025](https://www.unesco.org/en/literacy)) | Text-only interfaces exclude or burden a very large population. Ocular does not claim to solve literacy by itself, but it demonstrates why explanation should not depend on prose alone. |
+| The World Bank and partners estimated that **70% of ten-year-olds in low- and middle-income countries** could not understand a simple written text after the pandemic shock. ([World Bank](https://www.worldbank.org/en/news/press-release/2022/06/23/70-of-10-year-olds-now-in-learning-poverty-unable-to-read-and-understand-a-simple-text)) | A short prompt followed by narration and visual demonstration can reduce dependence on long blocks of reading. |
+| A meta-analysis of **26 studies and 76 comparisons** found a medium overall learning advantage for instructional animation over static pictures (`d = 0.37`), rising for representational animation (`d = 0.40`). ([Hoffler and Leutner](https://doi.org/10.1016/j.learninstruc.2007.09.013)) | Purposeful motion can help when it directly represents the process being learned rather than serving as decoration. |
+
+Ocular deliberately avoids the unsupported claim that a fixed percentage of people are "visual learners." A major review found virtually no evidence that matching instruction to a labeled learning style improves outcomes. ([Pashler et al.](https://doi.org/10.1111/j.1539-6053.2009.01038.x)) Ocular instead uses a stronger principle: **match the representation to the subject**. Use a graph for a derivative, a molecule for chemistry, a map for movement, a network for breadth-first search, and a timeline for history.
+
+
+### Problem 2: generative video is the wrong primitive for on-demand teaching
 
 An educational scene must preserve identity, causality, sequence, labels, quantities, and physical relationships. A visually attractive clip is not useful if a chromosome separates incorrectly, an arrow reverses direction, a graph changes meaning between frames, or a model forgets which layer was frozen.
 
@@ -44,18 +58,6 @@ Current evidence makes the reliability problem concrete:
 
 Ocular therefore does **not** call a text-to-video API for every lesson. It uses a language model for instructional planning and narration, then renders reusable 2D objects and motion locally through bounded, inspectable tools. This makes each relationship selectable, testable, and reproducible.
 
-### Problem 2: text alone does not make every mechanism understandable
-
-This is not a claim that every learner needs the same format. It is a claim that some ideas are inherently easier to understand when change, space, scale, flow, and cause are shown instead of merely described.
-
-| Research signal | Why it matters |
-| --- | --- |
-| UNESCO reports that **57% of children worldwide lack basic skills**. ([UNESCO, 2025](https://www.unesco.org/en/articles/what-we-stand-lose-costs-children-and-youth-not-learning-2030)) | The global learning problem is not simply access to more text; many learners are not reaching foundational understanding. |
-| UNESCO reports that **739 million adults** still lack basic literacy skills. ([UNESCO literacy data, 2025](https://www.unesco.org/en/literacy)) | Text-only interfaces exclude or burden a very large population. Ocular does not claim to solve literacy by itself, but it demonstrates why explanation should not depend on prose alone. |
-| The World Bank and partners estimated that **70% of ten-year-olds in low- and middle-income countries** could not understand a simple written text after the pandemic shock. ([World Bank](https://www.worldbank.org/en/news/press-release/2022/06/23/70-of-10-year-olds-now-in-learning-poverty-unable-to-read-and-understand-a-simple-text)) | A short prompt followed by narration and visual demonstration can reduce dependence on long blocks of reading. |
-| A meta-analysis of **26 studies and 76 comparisons** found a medium overall learning advantage for instructional animation over static pictures (`d = 0.37`), rising for representational animation (`d = 0.40`). ([Hoffler and Leutner](https://doi.org/10.1016/j.learninstruc.2007.09.013)) | Purposeful motion can help when it directly represents the process being learned rather than serving as decoration. |
-
-Ocular deliberately avoids the unsupported claim that a fixed percentage of people are "visual learners." A major review found virtually no evidence that matching instruction to a labeled learning style improves outcomes. ([Pashler et al.](https://doi.org/10.1111/j.1539-6053.2009.01038.x)) Ocular instead uses a stronger principle: **match the representation to the subject**. Use a graph for a derivative, a molecule for chemistry, a map for movement, a network for breadth-first search, and a timeline for history.
 
 ### Who experiences the bottleneck?
 
