@@ -12,9 +12,14 @@ const localBindingConfig = {
 
 export default defineConfig(async ({ mode }) => {
   // Read server-only local credentials from the backend folder. Vite exposes
-  // only VITE_-prefixed values to browser code; this key remains server-side.
+  // only VITE_-prefixed values to browser code; these keys remain server-side.
   const backendEnv = loadEnv(mode, '../backend', '');
   process.env.GEMINI_API_KEY ??= backendEnv.GEMINI_API_KEY;
+  process.env.OPENAI_API_KEY ??= backendEnv.OPENAI_API_KEY;
+  process.env.OPENAI_MODEL ??= backendEnv.OPENAI_MODEL;
+  process.env.OPENAI_TTS_MODEL ??= backendEnv.OPENAI_TTS_MODEL;
+  process.env.OPENAI_TTS_VOICE ??= backendEnv.OPENAI_TTS_VOICE;
+  process.env.OCULAR_AI_PROVIDER ??= backendEnv.OCULAR_AI_PROVIDER;
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= 'false';
@@ -36,8 +41,26 @@ export default defineConfig(async ({ mode }) => {
         config: {
           ...localBindingConfig,
           vars: {
-            ...(backendEnv.GEMINI_API_KEY ? { GEMINI_API_KEY: backendEnv.GEMINI_API_KEY } : {}),
-            OCULAR_RENDERER_URL: backendEnv.OCULAR_RENDERER_URL || 'http://127.0.0.1:8789',
+            ...(backendEnv.GEMINI_API_KEY
+              ? { GEMINI_API_KEY: backendEnv.GEMINI_API_KEY }
+              : {}),
+            ...(backendEnv.OPENAI_API_KEY
+              ? { OPENAI_API_KEY: backendEnv.OPENAI_API_KEY }
+              : {}),
+            ...(backendEnv.OPENAI_MODEL
+              ? { OPENAI_MODEL: backendEnv.OPENAI_MODEL }
+              : {}),
+            ...(backendEnv.OPENAI_TTS_MODEL
+              ? { OPENAI_TTS_MODEL: backendEnv.OPENAI_TTS_MODEL }
+              : {}),
+            ...(backendEnv.OPENAI_TTS_VOICE
+              ? { OPENAI_TTS_VOICE: backendEnv.OPENAI_TTS_VOICE }
+              : {}),
+            ...(backendEnv.OCULAR_AI_PROVIDER
+              ? { OCULAR_AI_PROVIDER: backendEnv.OCULAR_AI_PROVIDER }
+              : {}),
+            OCULAR_RENDERER_URL:
+              backendEnv.OCULAR_RENDERER_URL || 'http://127.0.0.1:8789',
           },
         },
       }),

@@ -1,11 +1,11 @@
 # Ocular backend
 
-This folder contains Ocular's deterministic subject-aware renderer. The web route in `frontend/app/api/lesson/route.ts` asks Gemini for a typed lesson plan; this service turns eligible scenes into verified animated media with Manim and subject libraries.
+This folder contains Ocular's deterministic subject-aware renderer. The web route in `frontend/app/api/lesson/route.ts` asks the configured OpenAI or Gemini provider for a typed lesson plan; this service turns eligible scenes into verified animated media with Manim and subject libraries.
 
 Local credentials also belong in this folder:
 
 1. Copy `.env.example` to `.env`.
-2. Add a Gemini API key.
+2. Add an official OpenAI API key, a Gemini API key, or both.
 3. Never commit `.env`; it is ignored by Git.
 
 The local frontend runtime reads this server-only environment file through `vite.config.ts`. Browser code cannot access the key.

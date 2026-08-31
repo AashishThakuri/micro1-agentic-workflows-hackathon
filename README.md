@@ -9,7 +9,7 @@ Turn a topic, rough notes, or a PDF into a narrated visual lesson a learner can 
 **THE BETTER THE MODEL, THE BETTER THE EXPLANATION AND RESULT.**
 
 ![Agentic workflow](https://img.shields.io/badge/Workflow-Agentic-171714?style=flat-square)
-![Gemini](https://img.shields.io/badge/Models-Gemini-f4c84a?style=flat-square)
+![Model providers](https://img.shields.io/badge/Models-OpenAI%20%2B%20Gemini-f4c84a?style=flat-square)
 ![React](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-75a7c5?style=flat-square)
 ![Python](https://img.shields.io/badge/Renderer-Python%20%2B%20Manim-94a86b?style=flat-square)
 ![Evaluation](https://img.shields.io/badge/Evaluation-10%2F10-171714?style=flat-square)
@@ -148,7 +148,18 @@ All educational visuals are generated locally from the typed plan. External imag
 
 **The better the model, the better the explanation and result.** Stronger reasoning, instruction following, and structured-output reliability generally improve lesson sequencing, example selection, visual planning, narration, and clarification quality. Ocular's typed contracts and deterministic tools provide reliability, but they do not remove the value of a capable model: the model decides what should be taught, while the tools make that plan executable and verifiable.
 
-The text-model fallback order is defined in [`frontend/app/api/lesson/gemini-json.ts`](frontend/app/api/lesson/gemini-json.ts). If a model is unavailable or returns invalid structured output, Ocular repairs valid partial JSON where possible, tries the next configured model, and finally returns an honest local fallback rather than a blank workspace.
+The provider gateway is defined in [`frontend/app/api/lesson/structured-generation.ts`](frontend/app/api/lesson/structured-generation.ts). It supports the official OpenAI Responses API with strict JSON Schema Structured Outputs and the Gemini API with its configured model fallback list. If a provider is unavailable or returns invalid structured output, Ocular tries the next configured provider and finally returns an honest local fallback rather than a blank workspace.
+
+### Official OpenAI API support
+
+Ocular can run its Lesson Director, Clarification Agent, and narration tool using an official OpenAI API key. Planning and clarification use `POST /v1/responses` with Bearer authentication and strict JSON Schema output; narration uses `POST /v1/audio/speech`. The default models are configurable and no key is stored in source control. See the official [Responses API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create) and [GPT-4o Mini TTS model documentation](https://developers.openai.com/api/docs/models/gpt-4o-mini-tts).
+
+Provider behavior:
+
+- `OCULAR_AI_PROVIDER=auto` uses OpenAI first when `OPENAI_API_KEY` is available, then Gemini as a fallback.
+- `OCULAR_AI_PROVIDER=openai` requires `OPENAI_API_KEY` and uses only OpenAI.
+- `OCULAR_AI_PROVIDER=gemini` requires `GEMINI_API_KEY` and uses only Gemini.
+- The API routes return `X-Ocular-Provider` and `X-Ocular-Model` response headers so evaluation runs record which provider produced each lesson.
 
 ## End-to-end learner experience
 
@@ -179,7 +190,7 @@ This metric reflects the promised learner outcome. Concept coverage is also repo
 
 ### Fair baseline
 
-The baseline receives the same topic and keyword rubric but uses only one direct Gemini instruction:
+The baseline receives the same topic and keyword rubric but uses only one direct instruction to the selected model provider:
 
 ```text
 Explain this clearly to a beginner: <case>
@@ -226,7 +237,7 @@ The detailed record is preserved in [`IMPROVEMENT_CHANGELOG.md`](IMPROVEMENT_CHA
 - Python 3.12 (**tested renderer environment: 3.12.12**)
 - uv (**tested: 0.9.18**; exact Python dependencies are locked in `backend/uv.lock`)
 - FFmpeg (**tested: 7.1**) and the system libraries required by Manim
-- A Gemini API key
+- At least one model-provider key: `OPENAI_API_KEY` or `GEMINI_API_KEY`
 
 ### 1. Clone and configure
 
@@ -238,13 +249,26 @@ cp backend/.env.example backend/.env
 
 On Windows PowerShell, use `Copy-Item backend/.env.example backend/.env` instead of `cp`.
 
-Set the key in `backend/.env`:
+Set one provider in `backend/.env`. No real key belongs in Git.
+
+OpenAI configuration:
+
+```dotenv
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-5.2
+OPENAI_TTS_MODEL=gpt-4o-mini-tts
+OPENAI_TTS_VOICE=coral
+OCULAR_AI_PROVIDER=openai
+```
+
+Gemini configuration:
 
 ```dotenv
 GEMINI_API_KEY=your_gemini_api_key_here
+OCULAR_AI_PROVIDER=gemini
 ```
 
-Credentials are read server-side and are never exposed to the browser.
+To configure both providers with automatic fallback, add both keys and set `OCULAR_AI_PROVIDER=auto`. Credentials are read server-side and are never exposed to the browser.
 
 ### 2. Install and run
 
@@ -257,7 +281,7 @@ pnpm dev
 
 Open `http://localhost:3000`. The development command starts both the web application and the local precision renderer.
 
-First-time setup may take several minutes because scientific and animation dependencies must be installed. A typical lesson plan takes approximately 8 to 20 seconds before subject rendering and narration, depending on model availability and source length. Gemini cost depends on the selected models and the account's current pricing. The workflow makes a planning request for a lesson, a refinement request for each learner doubt, renderer requests for precision scenes, and narration requests for generated scenes.
+First-time setup may take several minutes because scientific and animation dependencies must be installed. A typical lesson plan takes approximately 8 to 20 seconds before subject rendering and narration, depending on provider availability and source length. API cost depends on the configured OpenAI or Gemini models and current account pricing. The workflow makes a planning request for a lesson, a refinement request for each learner doubt, renderer requests for precision scenes, and narration requests for generated scenes.
 
 ### 3. Run the fair comparison
 
@@ -309,7 +333,7 @@ Representative sanitized trajectories show instructions, inputs, tool calls, too
 ## Repository structure
 
 ```text
-frontend/    React, TypeScript, Vinext, Gemini agent routes, playback, and the learner studio
+frontend/    React, TypeScript, Vinext, OpenAI/Gemini agent routes, playback, and the learner studio
 backend/     FastAPI deterministic renderer, subject libraries, generated media, and tests
 evaluation/  Fixed cases, direct-prompt baseline, executable rubric, and complete results
 traces/      Sanitized representative trajectories for both agents
@@ -319,7 +343,7 @@ docs/        Supporting submission materials
 ## Safety, privacy, and responsible use
 
 - Credentials and `.env` files are excluded from Git.
-- The browser never receives the Gemini API key.
+- The browser never receives the OpenAI or Gemini API key.
 - Internet image fetching was removed; educational visuals are generated locally.
 - Mathematical expressions use a restricted parser instead of unrestricted evaluation.
 - Tool failures are isolated so one unavailable service does not silently destroy valid work.

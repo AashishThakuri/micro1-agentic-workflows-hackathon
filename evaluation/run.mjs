@@ -16,7 +16,16 @@ const env = Object.fromEntries(
       return [line.slice(0, separator).trim(), line.slice(separator + 1).trim()];
     }),
 );
-const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
+const openAiApiKey = process.env.OPENAI_API_KEY || env.OPENAI_API_KEY;
+const requestedProvider = (process.env.OCULAR_AI_PROVIDER || env.OCULAR_AI_PROVIDER || "auto").toLowerCase();
+const evaluationProvider = requestedProvider === "openai"
+  ? "openai"
+  : requestedProvider === "gemini"
+    ? "gemini"
+    : openAiApiKey
+      ? "openai"
+      : "gemini";
 const outputFlagIndex = process.argv.indexOf("--output");
 const outputPath =
   outputFlagIndex >= 0 && process.argv[outputFlagIndex + 1]
@@ -30,11 +39,15 @@ const codeCommit = (() => {
   }
 })();
 
-if (!apiKey) {
-  throw new Error("GEMINI_API_KEY is required in the environment or backend/.env.");
+if (evaluationProvider === "openai" && !openAiApiKey) {
+  throw new Error("OPENAI_API_KEY is required when OCULAR_AI_PROVIDER=openai.");
+}
+if (evaluationProvider === "gemini" && !geminiApiKey) {
+  throw new Error("GEMINI_API_KEY is required when OCULAR_AI_PROVIDER=gemini.");
 }
 
 const baselineModels = ["gemini-3.1-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash"];
+const openAiModel = process.env.OPENAI_MODEL || env.OPENAI_MODEL || "gpt-5.2";
 
 function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -45,7 +58,7 @@ function keywordCoverage(text, keywords) {
   return keywords.filter((keyword) => normalized.includes(keyword.toLowerCase())).length / keywords.length;
 }
 
-async function directPrompt(topic) {
+async function directGeminiPrompt(topic) {
   const started = performance.now();
   let lastError = "No baseline model completed.";
 
@@ -54,7 +67,7 @@ async function directPrompt(topic) {
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": geminiApiKey },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: `Explain this clearly to a beginner: ${topic}` }] }],
           generationConfig: { temperature: 0.4, maxOutputTokens: 1200 },
@@ -76,6 +89,59 @@ async function directPrompt(topic) {
   }
 
   return { ok: false, text: "", latencyMs: Math.round(performance.now() - started), error: lastError };
+}
+
+async function directOpenAiPrompt(topic) {
+  const started = performance.now();
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openAiApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: openAiModel,
+        input: `Explain this clearly to a beginner: ${topic}`,
+        max_output_tokens: 1200,
+        store: false,
+      }),
+      signal: AbortSignal.timeout(60000),
+    });
+    if (!response.ok) {
+      return {
+        ok: false,
+        text: "",
+        latencyMs: Math.round(performance.now() - started),
+        model: openAiModel,
+        error: `OpenAI returned ${response.status}`,
+      };
+    }
+    const payload = await response.json();
+    const text = payload.output_text || (payload.output || [])
+      .flatMap((item) => item.content || [])
+      .filter((item) => item.type === "output_text")
+      .map((item) => item.text || "")
+      .join("");
+    return {
+      ok: Boolean(text),
+      text,
+      latencyMs: Math.round(performance.now() - started),
+      model: openAiModel,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      text: "",
+      latencyMs: Math.round(performance.now() - started),
+      model: openAiModel,
+      error: error instanceof Error ? error.message : "OpenAI baseline request failed",
+    };
+  }
+}
+
+function directPrompt(topic) {
+  return evaluationProvider === "openai" ? directOpenAiPrompt(topic) : directGeminiPrompt(topic);
 }
 
 function inspectLesson(lesson, keywords) {
@@ -111,6 +177,8 @@ async function ocularLesson(topic) {
     lesson,
     latencyMs: Math.round(performance.now() - started),
     generation: response.headers.get("X-Ocular-Generation") || "agent",
+    provider: response.headers.get("X-Ocular-Provider") || evaluationProvider,
+    model: response.headers.get("X-Ocular-Model") || null,
   };
 }
 
@@ -137,6 +205,8 @@ for (const [index, evaluationCase] of cases.entries()) {
       ...inspected,
       latencyMs: solution.latencyMs,
       generation: solution.generation,
+      provider: solution.provider,
+      model: solution.model,
       lesson: solution.lesson,
     },
   });
@@ -175,7 +245,8 @@ const artifact = {
   environment: {
     node: process.version,
     ocularUrl: rootUrl,
-    baselineModels,
+    provider: evaluationProvider,
+    baselineModels: evaluationProvider === "openai" ? [openAiModel] : baselineModels,
   },
   rubric: {
     primaryMetric: "runnable visual lesson completion",

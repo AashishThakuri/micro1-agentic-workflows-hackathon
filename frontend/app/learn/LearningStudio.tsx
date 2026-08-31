@@ -786,7 +786,7 @@ export function LearningStudio() {
           audioUnavailableRef.current.add(scene.id);
           throw new Error(payload.error || "Narration is cooling down and will be prepared later.");
         }
-        if (!silent) setStatusMessage(`Gemini voice quota reached. Retrying this scene in ${retryAfter}s…`);
+        if (!silent) setStatusMessage(`Narration service is cooling down. Retrying this scene in ${retryAfter}s…`);
         await wait(retryAfter * 1000);
       }
       if (!response?.ok) throw new Error("Narration could not be generated.");

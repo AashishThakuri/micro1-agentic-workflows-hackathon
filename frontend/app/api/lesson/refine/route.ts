@@ -1,11 +1,19 @@
-import { ensureSceneAnimationCoverage, ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "../visual-language";
-import { GEMINI_TEXT_MODELS, parseGeminiJson } from "../gemini-json";
+import {
+  ensureSceneAnimationCoverage,
+  ocularVisualLanguage,
+  removeNarrationDashes,
+  sceneProperties,
+} from '../visual-language';
+import {
+  generateStructuredJson,
+  hasConfiguredModelProvider,
+} from '../structured-generation';
 
 type VisualElement = {
   label: string;
   detail: string;
-  role: "source" | "process" | "result" | "context" | "question" | "evidence";
-  accent: "ink" | "ochre" | "red" | "blue" | "olive";
+  role: 'source' | 'process' | 'result' | 'context' | 'question' | 'evidence';
+  accent: 'ink' | 'ochre' | 'red' | 'blue' | 'olive';
   symbol: string;
 };
 
@@ -14,24 +22,50 @@ type Scene = {
   objective: string;
   narration: string;
   durationSeconds: number;
-  visualType: "metaphor" | "process" | "comparison" | "system" | "timeline" | "cycle" | "hierarchy" | "spatial" | "equation" | "story";
+  visualType:
+    | 'metaphor'
+    | 'process'
+    | 'comparison'
+    | 'system'
+    | 'timeline'
+    | 'cycle'
+    | 'hierarchy'
+    | 'spatial'
+    | 'equation'
+    | 'story';
   visualTitle: string;
   visualMetaphor: string;
-  motion: "none" | "flow" | "reveal" | "pulse" | "orbit" | "transform";
+  motion: 'none' | 'flow' | 'reveal' | 'pulse' | 'orbit' | 'transform';
   visualElements: VisualElement[];
   connections: Array<{ from: number; to: number; label: string }>;
   animationBeats: Array<{
     atPercent: number;
     targetIndex: number;
     relatedIndex: number;
-    action: "draw" | "reveal" | "move" | "trace" | "connect" | "disconnect" | "rotate" | "scale" | "split" | "merge" | "accumulate" | "remove" | "compare" | "transform" | "highlight" | "simulate";
+    action:
+      | 'draw'
+      | 'reveal'
+      | 'move'
+      | 'trace'
+      | 'connect'
+      | 'disconnect'
+      | 'rotate'
+      | 'scale'
+      | 'split'
+      | 'merge'
+      | 'accumulate'
+      | 'remove'
+      | 'compare'
+      | 'transform'
+      | 'highlight'
+      | 'simulate';
     narrationCue: string;
   }>;
   interaction: {
     label: string;
     targetIndex: number;
-    kind: "slider" | "toggle" | "stepper";
-    effect: "rotate" | "scale" | "translate" | "flow" | "count" | "intensity";
+    kind: 'slider' | 'toggle' | 'stepper';
+    effect: 'rotate' | 'scale' | 'translate' | 'flow' | 'count' | 'intensity';
     min: number;
     max: number;
     step: number;
@@ -45,77 +79,77 @@ type Scene = {
 };
 
 const sceneSchema = {
-  type: "OBJECT",
+  type: 'OBJECT',
   properties: sceneProperties,
   required: Object.keys(sceneProperties),
 };
 
 export async function POST(request: Request) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return Response.json({ error: "The lesson engine is not configured." }, { status: 503 });
+  if (!hasConfiguredModelProvider()) {
+    return Response.json(
+      { error: 'The lesson engine is not configured.' },
+      { status: 503 },
+    );
+  }
 
-  const input = (await request.json()) as { lessonTitle?: string; scene?: Scene; comment?: string };
+  const input = (await request.json()) as {
+    lessonTitle?: string;
+    scene?: Scene;
+    comment?: string;
+  };
   if (!input.scene || !input.comment?.trim()) {
-    return Response.json({ error: "Describe what is unclear in this scene." }, { status: 400 });
+    return Response.json(
+      { error: 'Describe what is unclear in this scene.' },
+      { status: 400 },
+    );
   }
 
   const prompt = [
-    "You create one follow-up clarification scene for an interactive Ocular visual lesson.",
-    `Lesson: ${input.lessonTitle || "Untitled lesson"}`,
+    'You create one follow-up clarification scene for an interactive Ocular visual lesson.',
+    `Lesson: ${input.lessonTitle || 'Untitled lesson'}`,
     `Current scene: ${JSON.stringify(input.scene)}`,
     `Learner's exact doubt or requested change: ${input.comment.trim()}`,
-    "Create a new scene that will be appended to the end of the lesson. Do not rewrite or summarize the original scene.",
+    'Create a new scene that will be appended to the end of the lesson. Do not rewrite or summarize the original scene.',
     "Use the learner's exact doubt as the sole teaching target. Resolve it directly, step by step, with a simpler visual model than before.",
-    "You may completely reinvent the metaphor, composition, objects, connections, motion, and duration for this clarification.",
-    "Make the follow-up visual demonstrate the answer instead of merely adding more words.",
-    "Begin narration directly with the explanation. The application adds its own spoken transition before your narration.",
-    "Keep narration free of em dashes and en dashes. Use commas and short sentences.",
-    "Create a meaningful direct manipulation that lets the learner change the mechanism and immediately see its consequence.",
+    'You may completely reinvent the metaphor, composition, objects, connections, motion, and duration for this clarification.',
+    'Make the follow-up visual demonstrate the answer instead of merely adding more words.',
+    'Begin narration directly with the explanation. The application adds its own spoken transition before your narration.',
+    'Keep narration free of em dashes and en dashes. Use commas and short sentences.',
+    'Create a meaningful direct manipulation that lets the learner change the mechanism and immediately see its consequence.',
     "Synchronize a topic-appropriate visual action to every meaningful narrated phrase. The action grammar is general and must be chosen from the learner's actual subject, never copied from an example topic.",
-    "Rebuild renderSpec as a safe structured renderer plan. For every branch of mathematics use engine manim and the precise mathematical template. Use scientific for measured physical systems, network for connected systems, simulation for discrete processes, molecule for chemistry, biology with phylogeny for evolutionary branching, biology with cell_division for mitosis or meiosis, astronomy for orbital relationships, map for geography, and the local illustration renderer for real organisms, anatomy, medicine, people, places, artworks, artifacts, specimens, machines, and other concrete subjects. Never use internet images. Use sketch only when no quantitative, biological, geographic, or locally generated subject renderer fits.",
-    "renderSpec expressions contain compact mathematics only, never prose or executable code.",
+    'Rebuild renderSpec as a safe structured renderer plan. For every branch of mathematics use engine manim and the precise mathematical template. Use scientific for measured physical systems, network for connected systems, simulation for discrete processes, molecule for chemistry, biology with phylogeny for evolutionary branching, biology with cell_division for mitosis or meiosis, astronomy for orbital relationships, map for geography, and the local illustration renderer for real organisms, anatomy, medicine, people, places, artworks, artifacts, specimens, machines, and other concrete subjects. Never use internet images. Use sketch only when no quantitative, biological, geographic, or locally generated subject renderer fits.',
+    'renderSpec expressions contain compact mathematics only, never prose or executable code.',
     ocularVisualLanguage,
-  ].join("\n");
+  ].join('\n');
 
-  for (const model of GEMINI_TEXT_MODELS) {
-    let response: Response;
-    try {
-      response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.35,
-              responseMimeType: "application/json",
-              responseSchema: sceneSchema,
-            },
-          }),
-          signal: AbortSignal.timeout(45_000),
+  try {
+    const result = await generateStructuredJson<Scene>({
+      name: 'ocular_clarification_scene',
+      prompt,
+      schema: sceneSchema,
+      temperature: 0.35,
+      maxOutputTokens: 8192,
+      validate: (scene) =>
+        Boolean(scene?.title && scene?.narration && scene?.interaction),
+    });
+    return Response.json(
+      removeNarrationDashes(ensureSceneAnimationCoverage(result.value)),
+      {
+        headers: {
+          'X-Ocular-Provider': result.provider,
+          'X-Ocular-Model': result.model,
         },
-      );
-    } catch (error) {
-      console.error("Gemini scene refinement did not complete", model, error);
-      continue;
-    }
-
-    if (response.ok) {
-      const payload = (await response.json()) as {
-        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-      };
-      const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) continue;
-      try {
-        return Response.json(removeNarrationDashes(ensureSceneAnimationCoverage(parseGeminiJson<Scene>(text))));
-      } catch (error) {
-        console.error("Gemini refinement JSON was invalid", model, error);
-      }
-    } else if (response.status !== 429 && response.status !== 503) {
-      break;
-    }
+      },
+    );
+  } catch (error) {
+    console.error('Clarification generation failed', error);
   }
 
-  return Response.json({ error: "This follow-up explanation could not be created yet. Please try again." }, { status: 502 });
+  return Response.json(
+    {
+      error:
+        'This follow-up explanation could not be created yet. Please try again.',
+    },
+    { status: 502 },
+  );
 }
