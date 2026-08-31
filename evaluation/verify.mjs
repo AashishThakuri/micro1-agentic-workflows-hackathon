@@ -69,8 +69,6 @@ const verified = {
   fallbackCases: artifact.results
     .filter((result) => result.ocular.generation !== "agent")
     .map((result) => result.id),
-  baselineEstimatedPlanningCostUsd: Number(artifact.results.reduce((sum, result) => sum + (result.baseline.estimatedCostUsd || 0), 0).toFixed(6)),
-  ocularEstimatedPlanningCostUsd: Number(artifact.results.reduce((sum, result) => sum + (result.ocular.estimatedCostUsd || 0), 0).toFixed(6)),
 };
 const expected = artifact.summary;
 const mismatches = Object.entries(verified).filter(

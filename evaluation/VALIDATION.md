@@ -1,13 +1,13 @@
 # Validation record
 
-Validation date: 2026-08-31. Evaluated workflow commit: `70bf7048f4d2934fd10dff20d884728791e07130`.
+Validation date: 2026-08-31. Evaluated workflow commit: `f713cff8d3ec20050d829921e336853797639b3b`.
 
 | Check | Exact command | Observed output | Result |
 | --- | --- | --- | --- |
-| Frozen score verification | `node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json` | 10 cases; baseline runnable 0; Ocular runnable 10; keyword coverage 95% vs 98%; median latency 4726 ms vs 7398 ms; no fallbacks; `mismatches: []` | Pass |
+| Frozen score verification | `node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json` | 10 cases; baseline runnable 0; Ocular runnable 10; keyword coverage 98% vs 98%; median latency 4023 ms vs 7072 ms; no fallbacks; `mismatches: []` | Pass |
 | Frontend lint | `cd frontend && pnpm lint` | `oxlint`, exit code 0 | Pass |
 | Production build | `cd frontend && pnpm build` | Vinext built all five environments; `/`, `/learn`, `/api/lesson`, `/api/lesson/refine`, `/api/render`, `/api/tts`, and `/favicon.ico` were emitted | Pass |
-| Renderer suite | `cd backend && uv run pytest -q` | `21 passed, 1 warning in 28.45s` | Pass |
+| Renderer suite | `cd backend && uv run pytest -q` | `21 passed, 1 warning in 27.34s` | Pass |
 
 The warning is a Python 3.13 deprecation notice emitted by `pydub`'s use of `audioop`; the tested renderer uses Python 3.12.12, so it does not change the result.
 
@@ -23,5 +23,17 @@ The warning is a Python 3.13 deprecation notice emitted by `pydub`'s use of `aud
 | Narration | `POST /api/tts` returned 200, `audio/wav`, and 464,684 bytes | Pass |
 | Precision rendering | `POST /api/render` returned 200 and a generated MP4 URL | Pass |
 | Missing OpenAI credential | Forced `OCULAR_AI_PROVIDER=openai` with no `OPENAI_API_KEY`; lesson endpoint returned a controlled 503 configuration error | Pass |
+
+The submitted API run used `gemini-3.1-flash-lite` for lesson planning and clarification, plus `gemini-3.1-flash-tts-preview` with the `Kore` voice for narration. It ran on the available Gemini free tier, so billed API cost was `$0`. OpenAI support is optional and was not used for the submitted result.
+
+## Clean-environment reproduction audit
+
+| Step | Exact command | Observed output | Result |
+| --- | --- | --- | --- |
+| Backend dependency lock | `uv sync --frozen --project backend` | Installed the locked Python 3.12 environment and 76 packages | Pass |
+| Backend tests | `cd backend && uv run pytest -q` | `21 passed, 1 warning in 27.34s` | Pass |
+| Frontend dependency lock | `cd frontend && pnpm install --frozen-lockfile --force` | Installed the lockfile including platform-native bindings | Pass |
+| Frontend lint | `cd frontend && pnpm lint` | `oxlint`, exit code 0 | Pass |
+| Frontend production build | `cd frontend && pnpm build` | All application and API routes emitted, exit code 0 | Pass |
 
 The browser verification helper was unavailable on this Windows host, so the validation claim is limited to HTTP/runtime, lint, production build, API evaluation, and renderer-test evidence. No visual browser-test score is claimed.

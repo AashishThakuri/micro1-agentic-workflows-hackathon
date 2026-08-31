@@ -15,7 +15,7 @@ This reflects the learner's actual outcome. A fluent paragraph is useful, but it
 
 ## Fair baseline
 
-The baseline is one direct prompt to the selected provider: `Explain this clearly to a beginner: <case>`. It receives the same topic and keyword rubric as Ocular, but no typed schema, renderer, narration workflow, interaction contract, verification, or clarification agent. The frozen submitted artifact used Gemini; new runs may use OpenAI or Gemini, but baseline and Ocular always use the same selected provider.
+The baseline receives the same learner-facing visual-lesson task, topic, cases, provider family, and rubric as Ocular. It gets one direct model response with no typed schema, tools, renderer, application runtime, verification, memory, or clarification agent. The harness attempts to parse that response as a lesson and applies the same six structure checks; baseline runnability is computed, never hard-coded. The frozen submitted artifact used Gemini; new runs may use OpenAI or Gemini, but baseline and Ocular always use the same selected provider.
 
 The comparison reports the baseline's advantage in latency instead of hiding it. Both systems are scored for concept-keyword coverage, but only a complete playable artifact can pass the primary metric.
 
@@ -40,6 +40,8 @@ Environment variables:
 - `OCULAR_URL` - optional application origin; defaults to `http://localhost:3000`.
 
 The harness prints every case, saves the complete baseline text and Ocular lesson output, and does not discard failures. A nonzero exit code means at least one Ocular case failed the runnable-lesson rubric.
+
+The submitted run used `gemini-3.1-flash-lite` for both the direct baseline and Ocular planning. Narration uses `gemini-3.1-flash-tts-preview` with the `Kore` voice. It ran on the Gemini free tier, so recorded API cost was `$0`. The artifact still records model IDs and token usage for reproducibility.
 
 Recompute the submitted scores directly from the frozen raw outputs:
 

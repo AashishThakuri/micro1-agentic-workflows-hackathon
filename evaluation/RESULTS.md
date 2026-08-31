@@ -1,30 +1,39 @@
 # Recorded evaluation results
 
-Run date: 2026-08-31. Ten fixed cases, same topics and keyword rubric for both systems. No failed case was removed. The source of truth is the complete raw artifact at [`artifacts/run-2026-08-31.json`](artifacts/run-2026-08-31.json), produced from the workflow at code commit `70bf7048f4d2934fd10dff20d884728791e07130`.
+Run date: 2026-08-31. Ten fixed cases, same learner-facing visual-lesson task, topics, Gemini model family, and computed rubric for both systems. No failed case was removed and baseline runnability is not hard-coded. The source of truth is the complete raw artifact at [`artifacts/run-2026-08-31.json`](artifacts/run-2026-08-31.json), produced from the workflow at code commit `f713cff8d3ec20050d829921e336853797639b3b`.
 
 | Metric | Direct-prompt baseline | Ocular | Change |
 | --- | ---: | ---: | ---: |
 | Runnable visual lessons | 0/10 | 10/10 | +100 percentage points |
-| Average concept-keyword coverage | 95% | 98% | +3 points |
-| Median planning latency | 4.73 s | 7.40 s | +2.67 s |
+| Average concept-keyword coverage | 98% | 98% | No difference |
+| Median planning latency | 4.02 s | 7.07 s | +3.05 s |
 | Model fallback cases | N/A | 0/10 | All used the agent path |
+| Submitted API cost | $0 | $0 | Gemini free tier |
 
-The result is intentionally specific: Ocular improved keyword inclusion by only three points and was slower. Its meaningful improvement was the target learner outcome: converting subject coverage into a structured, playable artifact.
+The result is intentionally specific: both systems covered the concepts equally well and the direct response was faster. Ocular's improvement was the target learner outcome: converting the same subject coverage into a structured, playable artifact.
 
 ## Complete case results
 
 | Case | Baseline keywords | Baseline runnable | Ocular keywords | Ocular runnable | Scenes | Ocular latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Transfer learning (challenging case) | 100% | No | 100% | Yes | 2 | 6.06 s |
-| Mitosis | 100% | No | 100% | Yes | 2 | 5.81 s |
-| Derivative | 75% | No | 100% | Yes | 2 | 7.61 s |
-| Normal distribution | 100% | No | 100% | Yes | 2 | 8.14 s |
-| Differential equation | 75% | No | 100% | Yes | 2 | 8.95 s |
-| Breadth-first search | 100% | No | 75% | Yes | 2 | 7.06 s |
-| Photosynthesis | 100% | No | 100% | Yes | 2 | 7.19 s |
-| Supply and demand | 100% | No | 100% | Yes | 2 | 7.60 s |
-| Plate tectonics | 100% | No | 100% | Yes | 2 | 7.20 s |
-| DNA transcription | 100% | No | 100% | Yes | 2 | 8.13 s |
+| Transfer learning (challenging case) | 100% | No | 100% | Yes | 2 | 10.70 s |
+| Mitosis | 100% | No | 100% | Yes | 2 | 7.09 s |
+| Derivative | 100% | No | 100% | Yes | 2 | 9.78 s |
+| Normal distribution | 100% | No | 100% | Yes | 3 | 7.82 s |
+| Differential equation | 75% | No | 75% | Yes | 2 | 6.10 s |
+| Breadth-first search | 100% | No | 100% | Yes | 2 | 6.47 s |
+| Photosynthesis | 100% | No | 100% | Yes | 2 | 6.56 s |
+| Supply and demand | 100% | No | 100% | Yes | 2 | 7.05 s |
+| Plate tectonics | 100% | No | 100% | Yes | 2 | 6.86 s |
+| DNA transcription | 100% | No | 100% | Yes | 2 | 10.50 s |
+
+## Models and cost
+
+- Baseline and Ocular planning: `gemini-3.1-flash-lite`.
+- Narration: `gemini-3.1-flash-tts-preview`, `Kore` voice.
+- Submitted billing tier: Gemini free tier.
+- Recorded API cost: `$0`.
+- Local deterministic rendering: no external generation API charge.
 
 ## What the challenging case revealed
 

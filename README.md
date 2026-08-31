@@ -9,7 +9,7 @@ Turn a topic, rough notes, or a PDF into a narrated visual lesson a learner can 
 **THE BETTER THE MODEL, THE BETTER THE EXPLANATION AND RESULT.**
 
 ![Agentic workflow](https://img.shields.io/badge/Workflow-Agentic-171714?style=flat-square)
-![Model providers](https://img.shields.io/badge/Models-OpenAI%20%2B%20Gemini-f4c84a?style=flat-square)
+![Model providers](https://img.shields.io/badge/Tested-Gemini%20free%20tier-f4c84a?style=flat-square)
 ![React](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-75a7c5?style=flat-square)
 ![Python](https://img.shields.io/badge/Renderer-Python%20%2B%20Manim-94a86b?style=flat-square)
 ![Evaluation](https://img.shields.io/badge/Evaluation-10%2F10-171714?style=flat-square)
@@ -35,15 +35,14 @@ Turn a topic, rough notes, or a PDF into a narrated visual lesson a learner can 
 
 An educational scene must preserve identity, causality, sequence, labels, quantities, and physical relationships. A visually attractive clip is not useful if a chromosome separates incorrectly, an arrow reverses direction, a graph changes meaning between frames, or a model forgets which layer was frozen.
 
-Current evidence makes both the cost and reliability problem concrete:
+Current evidence makes the reliability problem concrete:
 
 | Evidence | What it means for an educational product |
 | --- | --- |
-| As accessed on 31 August 2026, Google's Gemini API price for Veo 3.1 Standard with audio is **$0.40 per generated second** at 720p or 1080p. That is **$24 for 60 seconds** and a **$120 five-minute equivalent** before retries. Even the 720p Fast tier is $0.10 per second, or a $30 five-minute equivalent. ([Google AI pricing](https://ai.google.dev/gemini-api/docs/pricing)) | Per-second generation makes personalized lessons costly to create repeatedly, especially when a failed scene must be regenerated. The five-minute figures are transparent extrapolations from the published per-second rates, not a claim that one request produces a continuous five-minute clip. |
 | TC-Bench found that most evaluated video generators completed **less than 20% of requested compositional changes** across time. ([TC-Bench paper](https://arxiv.org/abs/2406.08656)) | A model may render appealing frames without completing the exact transition the lesson is supposed to teach. |
 | T2VPhysBench reported that every evaluated model scored below **0.60 average compliance** in each tested physical-law category. ([T2VPhysBench paper](https://arxiv.org/abs/2505.00337)) | Visual realism is not the same as instructional or physical correctness. |
 
-Ocular therefore does **not** call a text-to-video API for every lesson. It uses a language model for instructional planning and narration, then renders reusable 2D objects and motion locally through bounded, inspectable tools. This removes the per-second generative-video bill while making each relationship selectable, testable, and reproducible. Text-model, narration, and local compute costs still exist and depend on the selected model and deployment.
+Ocular therefore does **not** call a text-to-video API for every lesson. It uses a language model for instructional planning and narration, then renders reusable 2D objects and motion locally through bounded, inspectable tools. This makes each relationship selectable, testable, and reproducible.
 
 ### Problem 2: text alone does not make every mechanism understandable
 
@@ -74,7 +73,7 @@ Ocular compresses that production workflow into one learner action. The result i
 | Conventional text-to-video workflow | Ocular |
 | --- | --- |
 | Generates pixels directly from a prompt. | Generates a typed teaching plan with objectives, objects, connections, narration, animation beats, interaction, and a renderer contract. |
-| Charges by generated duration and often needs costly retries. | Avoids a generative-video API; text planning, narration, and deterministic local rendering are independent costs. |
+| Produces a fixed video that must be regenerated when an explanation changes. | Produces reusable scene objects, narration, and deterministic local animation that can be refined independently. |
 | The scene is flattened into frames. | Objects remain named, selectable, and manipulable. |
 | Prompt adherence and physics are difficult to inspect. | Equations, molecule strings, coordinates, graphs, networks, and templates are validated before playback. |
 | Clarification usually means generating another clip. | The Clarification Agent appends one focused scene using the exact doubt and current lesson context. |
@@ -150,9 +149,20 @@ All educational visuals are generated locally from the typed plan. External imag
 
 The provider gateway is defined in [`frontend/app/api/lesson/structured-generation.ts`](frontend/app/api/lesson/structured-generation.ts). It supports the official OpenAI Responses API with strict JSON Schema Structured Outputs and the Gemini API with its configured model fallback list. If a provider is unavailable or returns invalid structured output, Ocular tries the next configured provider and finally returns an honest local fallback rather than a blank workspace.
 
-### Official OpenAI API support
+### Models used in the submitted workflow
 
-Ocular can run its Lesson Director, Clarification Agent, and narration tool using an official OpenAI API key. Planning and clarification use `POST /v1/responses` with Bearer authentication and strict JSON Schema output; narration uses `POST /v1/audio/speech`. The default models are configurable and no key is stored in source control. See the official [Responses API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create) and [GPT-4o Mini TTS model documentation](https://developers.openai.com/api/docs/models/gpt-4o-mini-tts).
+| Role | Submitted model | Status |
+| --- | --- | --- |
+| Lesson Director and Clarification Agent | `gemini-3.1-flash-lite` | Tested end to end with the Gemini API free tier |
+| Narration voice | `gemini-3.1-flash-tts-preview` using the `Kore` voice | Tested end to end with the Gemini API free tier |
+| Deterministic visuals | Manim and the local scientific renderer libraries listed above | Runs locally; no image-generation or video-generation API |
+| Optional provider | OpenAI Responses API and `gpt-4o-mini-tts` | Implemented for judges who supply their own key; not used for the submitted results |
+
+The recorded submission run used the available Gemini free tier, so its billed API cost was **$0**. Token usage, model IDs, and request latency are stored in the raw evaluation artifact. OpenAI is optional and is not required to reproduce the submitted Gemini result.
+
+### Optional official OpenAI API support
+
+Ocular can also run its Lesson Director, Clarification Agent, and narration tool using an official OpenAI API key supplied by the person running the project. Planning and clarification use `POST /v1/responses` with Bearer authentication and strict JSON Schema output; narration uses `POST /v1/audio/speech`. No OpenAI key was available or used for this submission, and no key is stored in source control. See the official [Responses API reference](https://developers.openai.com/api/reference/cli/resources/responses/methods/create) and [GPT-4o Mini TTS model documentation](https://developers.openai.com/api/docs/models/gpt-4o-mini-tts).
 
 Provider behavior:
 
@@ -190,15 +200,15 @@ This metric reflects the promised learner outcome. Concept coverage is also repo
 
 ### Fair baseline
 
-The baseline receives the same topic and keyword rubric but uses only one direct instruction to the selected model provider:
+The baseline receives the same learner-facing task, topic, cases, provider family, and scoring rubric as Ocular. Its only resource is one direct model response:
 
 ```text
-Explain this clearly to a beginner: <case>
+Create a complete beginner-friendly visual lesson for <case>. The final response itself should help the learner see the mechanism unfold, follow narration, manipulate the explanation, and ask a follow-up question. Use only this one direct response and no tools or external assets.
 ```
 
-It has no typed scene schema, renderer, narration workflow, interaction contract, verification, or clarification agent. This gives the baseline a real latency advantage, which the results report rather than hide.
+It has no typed scene schema, renderer, narration workflow, interaction contract, verification, memory, or clarification agent. The harness parses the baseline response and applies the same six runnable-lesson checks; no baseline result is hard-coded. This gives the baseline a real latency advantage, which the results report rather than hide.
 
-The executable baseline is deliberately the common low-cost alternative: ask a general-purpose model for an explanation. Ocular does **not** claim that its ten-case run is a head-to-head evaluation against Veo or another commercial video generator. The pricing and benchmark results above are external evidence for the product-design problem; the repository evaluation isolates whether Ocular's agent workflow produces a more usable artifact than a direct prompt on the same task.
+The executable baseline is a common alternative: ask a general-purpose model to produce the best visual lesson it can in one response. Ocular does **not** claim that its ten-case run is a head-to-head evaluation against a commercial video generator. The repository evaluation isolates whether Ocular's agent workflow produces a more usable artifact than a direct prompt on the same task.
 
 ### Challenging case: transfer learning
 
@@ -209,6 +219,10 @@ The fixed challenging prompt is:
 A successful result must cover reusable features, knowledge transfer, frozen feature extraction, fine-tuning, small-data value, and domain mismatch.
 
 An early development run exposed sparse animation timelines, so Ocular added deterministic narration-linked timeline completion. The later reproducibility audit exposed a separate issue: one differential-equation response contained only one scene, producing 9/10. That complete failed run is preserved, the minimum two-scene contract is now verified and retried, and the same ten cases then passed 10/10 without relaxing the rubric.
+
+## What existed before the competition
+
+No Ocular application code, agent workflow, renderer, evaluation harness, evidence artifact, or trajectory existed before this hackathon. The repository history begins with the landing page created during the competition. The direct-response baseline is the first functional comparison stage inside that history, not a claim of pre-competition work. Every submitted implementation file and documented experiment was created during the event.
 
 ## Improvement Changelog
 
@@ -236,7 +250,7 @@ The detailed record is preserved in [`IMPROVEMENT_CHANGELOG.md`](IMPROVEMENT_CHA
 - pnpm 9 (**tested: 9.15.4**; exact JavaScript dependencies are locked in `frontend/pnpm-lock.yaml`)
 - Python 3.12 (**tested renderer environment: 3.12.12**)
 - uv (**tested: 0.9.18**; exact Python dependencies are locked in `backend/uv.lock`)
-- FFmpeg (**tested: 7.1**) and the system libraries required by Manim
+- Manim's platform requirements. Manim 0.21 uses the locked PyAV package, so a separate FFmpeg command-line installation is not required for the submitted renderer.
 - At least one model-provider key: `OPENAI_API_KEY` or `GEMINI_API_KEY`
 
 ### 1. Clone and configure
@@ -249,9 +263,14 @@ cp backend/.env.example backend/.env
 
 On Windows PowerShell, use `Copy-Item backend/.env.example backend/.env` instead of `cp`.
 
-Set one provider in `backend/.env`. No real key belongs in Git.
+Set one provider in `backend/.env`. No real key belongs in Git. The submitted and reproduced configuration is Gemini:
 
-OpenAI configuration:
+```dotenv
+GEMINI_API_KEY=your_gemini_api_key_here
+OCULAR_AI_PROVIDER=gemini
+```
+
+OpenAI remains optional for a judge who wants to test it with their own official key:
 
 ```dotenv
 OPENAI_API_KEY=your_openai_api_key_here
@@ -261,13 +280,6 @@ OPENAI_TTS_VOICE=coral
 OCULAR_AI_PROVIDER=openai
 ```
 
-Gemini configuration:
-
-```dotenv
-GEMINI_API_KEY=your_gemini_api_key_here
-OCULAR_AI_PROVIDER=gemini
-```
-
 To configure both providers with automatic fallback, add both keys and set `OCULAR_AI_PROVIDER=auto`. Credentials are read server-side and are never exposed to the browser.
 
 ### 2. Install and run
@@ -275,13 +287,15 @@ To configure both providers with automatic fallback, add both keys and set `OCUL
 ```bash
 uv sync --project backend
 cd frontend
-pnpm install
+pnpm install --frozen-lockfile --force
 pnpm dev
 ```
 
 Open `http://localhost:3000`. The development command starts both the web application and the local precision renderer.
 
-First-time setup may take several minutes because scientific and animation dependencies must be installed. A typical lesson plan takes approximately 8 to 20 seconds before subject rendering and narration, depending on provider availability and source length. API cost depends on the configured OpenAI or Gemini models and current account pricing. The workflow makes a planning request for a lesson, a refinement request for each learner doubt, renderer requests for precision scenes, and narration requests for generated scenes.
+On Windows, the locked wheels installed by `uv sync` contain the required renderer dependencies. On macOS, install Cairo and pkg-config with `brew install cairo pkg-config`. On Debian or Ubuntu, run `sudo apt update && sudo apt install -y build-essential python3-dev libcairo2-dev libpango1.0-dev`. These platform steps follow the [official Manim installation guide](https://docs.manim.community/en/stable/installation/windows.html).
+
+First-time setup may take several minutes because scientific and animation dependencies must be installed. A typical Gemini lesson plan takes approximately 6 to 11 seconds in the recorded run before subject rendering and narration. The submitted workflow used `gemini-3.1-flash-lite` for planning and `gemini-3.1-flash-tts-preview` with the `Kore` voice for narration. It ran on the Gemini free tier, so recorded API cost was **$0**. The workflow makes one planning request per lesson, one refinement request per learner doubt, local renderer requests for precision scenes, and narration requests for generated scenes.
 
 ### 3. Run the fair comparison
 
@@ -296,7 +310,9 @@ Expected recorded headline result:
 ```text
 Direct-prompt baseline: 0/10 runnable visual lessons
 Ocular:                 10/10 runnable visual lessons
-Average keyword coverage: baseline 95%, Ocular 98%
+Average keyword coverage: baseline 98%, Ocular 98%
+Median planning latency: baseline 4.02 s, Ocular 7.07 s
+Submitted Gemini free-tier API cost: $0
 ```
 
 The harness prints all cases and exits with a nonzero status if any Ocular case fails the runnable-lesson contract. Set `OCULAR_URL` only when evaluating an origin other than `http://localhost:3000`.
@@ -307,7 +323,7 @@ The output artifact contains the complete baseline text, complete Ocular lesson 
 node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json
 ```
 
-Expected verifier result: `10` cases, baseline runnable `0`, Ocular runnable `10`, keyword coverage `95%` for the baseline and `98%` for Ocular, and an empty `mismatches` array. The frozen raw run is the evidence behind [`evaluation/RESULTS.md`](evaluation/RESULTS.md); the Markdown table is not treated as the source of truth.
+Expected verifier result: `10` cases, baseline runnable `0`, Ocular runnable `10`, keyword coverage `98%` for both, median planning latency `4023 ms` versus `7072 ms`, no model fallbacks, and an empty `mismatches` array. The frozen raw run is the evidence behind [`evaluation/RESULTS.md`](evaluation/RESULTS.md); the Markdown table is not treated as the source of truth.
 
 ### 4. Verify deterministic rendering
 
@@ -359,4 +375,4 @@ The fix was not merely a larger prompt. Ocular moved to typed plans, determinist
 
 ## License
 
-Hackathon submission by Aashish Thakuri. 
+Copyright 2026 Aashish Thakuri. All rights reserved. The repository is available to hackathon judges for review and reproduction of the submitted result. Third-party packages retain their own licenses; the principal dependencies and lockfiles are documented in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

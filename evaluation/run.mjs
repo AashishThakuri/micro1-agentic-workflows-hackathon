@@ -60,10 +60,6 @@ const baselinePrompt = (topic) => [
   `Topic: ${topic}`,
 ].join("\n");
 
-const modelPricesPerMillionTokens = {
-  "gemini-3.1-flash-lite": { input: 0.25, output: 1.5 },
-};
-
 function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
@@ -71,12 +67,6 @@ function wait(milliseconds) {
 function keywordCoverage(text, keywords) {
   const normalized = String(text || "").toLowerCase();
   return keywords.filter((keyword) => normalized.includes(keyword.toLowerCase())).length / keywords.length;
-}
-
-function estimatePlanningCostUsd(model, usage) {
-  const price = modelPricesPerMillionTokens[model];
-  if (!price || !usage) return null;
-  return Number((((usage.inputTokens || 0) * price.input + (usage.outputTokens || 0) * price.output) / 1_000_000).toFixed(6));
 }
 
 function parseDirectLesson(text) {
@@ -123,7 +113,6 @@ async function directGeminiPrompt(topic) {
         text,
         lesson: parseDirectLesson(text),
         usage,
-        estimatedCostUsd: estimatePlanningCostUsd(model, usage),
         latencyMs: Math.round(performance.now() - started),
         model,
       };
@@ -180,7 +169,6 @@ async function directOpenAiPrompt(topic) {
       text,
       lesson: parseDirectLesson(text),
       usage,
-      estimatedCostUsd: estimatePlanningCostUsd(openAiModel, usage),
       latencyMs: Math.round(performance.now() - started),
       model: openAiModel,
     };
@@ -241,7 +229,6 @@ async function ocularLesson(topic) {
     provider: response.headers.get("X-Ocular-Provider") || evaluationProvider,
     model,
     usage,
-    estimatedCostUsd: estimatePlanningCostUsd(model, usage),
   };
 }
 
@@ -266,7 +253,6 @@ for (const [index, evaluationCase] of cases.entries()) {
       runnable: baselineInspected.runnable,
       sceneCount: baselineInspected.sceneCount,
       usage: baseline.usage || { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-      estimatedCostUsd: baseline.estimatedCostUsd ?? null,
       latencyMs: baseline.latencyMs,
     },
     ocular: {
@@ -277,7 +263,6 @@ for (const [index, evaluationCase] of cases.entries()) {
       provider: solution.provider,
       model: solution.model,
       usage: solution.usage,
-      estimatedCostUsd: solution.estimatedCostUsd,
       lesson: solution.lesson,
     },
   });
@@ -304,8 +289,6 @@ const summary = {
   baselineMedianLatencyMs: median(results.map((result) => result.baseline.latencyMs)),
   ocularMedianLatencyMs: median(results.map((result) => result.ocular.latencyMs)),
   fallbackCases: results.filter((result) => result.ocular.generation !== "agent").map((result) => result.id),
-  baselineEstimatedPlanningCostUsd: Number(results.reduce((sum, result) => sum + (result.baseline.estimatedCostUsd || 0), 0).toFixed(6)),
-  ocularEstimatedPlanningCostUsd: Number(results.reduce((sum, result) => sum + (result.ocular.estimatedCostUsd || 0), 0).toFixed(6)),
 };
 
 const artifact = {
