@@ -1,6 +1,6 @@
 # Recorded evaluation results
 
-Run date: 2026-08-31. Ten fixed cases, same topics and keyword rubric for both systems. No failed case was removed. The source of truth is the complete raw artifact at [`artifacts/run-2026-08-31.json`](artifacts/run-2026-08-31.json), produced from code commit `b58c10881ff113a9c10a0d8abdd6ce1a5f75d363`.
+Run date: 2026-08-31. Ten fixed cases, same topics and keyword rubric for both systems. No failed case was removed. The source of truth is the complete raw artifact at [`artifacts/run-2026-08-31.json`](artifacts/run-2026-08-31.json), produced from the workflow at code commit `70bf7048f4d2934fd10dff20d884728791e07130`.
 
 | Metric | Direct-prompt baseline | Ocular | Change |
 | --- | ---: | ---: | ---: |
