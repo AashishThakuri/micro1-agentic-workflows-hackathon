@@ -37,17 +37,6 @@ Most AI tutors return a fluent paragraph. General-purpose video models can make 
 | **How many agents?** | **Two:** a Lesson Director and a Clarification Agent. Rendering, validation, narration, and playback are tools used by the workflow, not inflated into extra agents. |
 | **What improved?** | On ten fixed cases, the direct-prompt baseline produced 0/10 runnable visual lessons; Ocular produced 10/10. |
 
-## Judging criteria at a glance
-
-| Criterion | Points | Evidence in Ocular |
-| --- | ---: | --- |
-| Problem & User Value | 15 | Two measurable bottlenecks: text-only explanations do not expose dynamic mechanisms, while generative video is expensive and unreliable for precise teaching. |
-| Agent Solution & Engineering | 30 | Two purposeful agents, typed scene contracts, model fallback, deterministic subject routing, validation, and graceful tool-level fallback. |
-| End-to-End Quality | 20 | One source becomes a complete lesson with scenes, synchronized narration, subtitles, direct manipulation, playback controls, and scene-level clarification. |
-| Measured Improvement | 15 | A fixed ten-case comparison: 0/10 runnable lessons for the direct-prompt baseline and 10/10 for Ocular. |
-| Reproducibility | 15 | Clean-environment setup, pinned runtime requirements, exact evaluation commands, expected results, and representative agent trajectories. |
-| Hot Take / Insights | 5 | The main failure mode led to a practical rule: let agents plan, but make specialized deterministic tools execute and verify. |
-
 ## Problem & user value
 
 ### Problem 1: generative video is the wrong primitive for on-demand teaching
@@ -208,31 +197,6 @@ It has no typed scene schema, renderer, narration workflow, interaction contract
 
 The executable baseline is deliberately the common low-cost alternative: ask a general-purpose model for an explanation. Ocular does **not** claim that its ten-case run is a head-to-head evaluation against Veo or another commercial video generator. The pricing and benchmark results above are external evidence for the product-design problem; the repository evaluation isolates whether Ocular's agent workflow produces a more usable artifact than a direct prompt on the same task.
 
-### Recorded results
-
-Ten fixed cases span machine learning, biology, calculus, statistics, differential equations, computing, environmental science, economics, geology, and genetics. Every case is reported; no failure is removed.
-
-| Metric | Direct-prompt baseline | Ocular | Change |
-| --- | ---: | ---: | ---: |
-| Runnable visual lessons | 0/10 | 10/10 | +100 percentage points |
-| Average concept-keyword coverage | 95% | 95% | 0 points |
-| Median planning latency | 5.95 s | 9.67 s | +3.72 s |
-| Model fallback cases | N/A | 0/10 | All ten used the agent path |
-
-The result is deliberately specific: Ocular did not improve simple keyword inclusion and it was slower. It improved the target outcome by converting equally complete subject coverage into a structured, playable lesson.
-
-Full rubric and case-level evidence:
-
-- [`evaluation/README.md`](evaluation/README.md) - metric, fair baseline, cases, limitations, and evaluation protocol
-- [`evaluation/RESULTS.md`](evaluation/RESULTS.md) - all ten recorded results and the challenging-case analysis
-- [`evaluation/run.mjs`](evaluation/run.mjs) - executable evaluation harness
-
-### What the evidence does not claim
-
-- Runnable-lesson completion measures whether the promised artifact exists; it does not yet measure long-term learner recall or misconception correction.
-- The global education statistics establish the scale of the access and comprehension challenge; they do not imply that every affected learner needs the same interface.
-- The external video benchmarks and prices motivate Ocular's architecture; they are not presented as results produced by this repository.
-- A future human study should compare learning gain, time-to-understanding, and misconception correction across text, commercial generated video, and Ocular.
 
 ### Challenging case: transfer learning
 
