@@ -48,15 +48,29 @@ const recomputed = artifact.results.map((result) => {
 });
 
 const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+const median = (values) => {
+  const ordered = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(ordered.length / 2);
+  return ordered.length % 2
+    ? ordered[middle]
+    : Math.round((ordered[middle - 1] + ordered[middle]) / 2);
+};
 const verified = {
   cases: recomputed.length,
   baselineRunnable: 0,
   ocularRunnable: recomputed.filter((result) => result.ocularRunnable).length,
   baselineKeywordCoveragePercent: average(recomputed.map((result) => result.baselineKeywordCoverage * 100)),
   ocularKeywordCoveragePercent: average(recomputed.map((result) => result.ocularKeywordCoverage * 100)),
+  baselineMedianLatencyMs: median(artifact.results.map((result) => result.baseline.latencyMs)),
+  ocularMedianLatencyMs: median(artifact.results.map((result) => result.ocular.latencyMs)),
+  fallbackCases: artifact.results
+    .filter((result) => result.ocular.generation !== "agent")
+    .map((result) => result.id),
 };
 const expected = artifact.summary;
-const mismatches = Object.entries(verified).filter(([key, value]) => expected[key] !== value);
+const mismatches = Object.entries(verified).filter(
+  ([key, value]) => JSON.stringify(expected[key]) !== JSON.stringify(value),
+);
 
 console.log(JSON.stringify({ artifact: artifactPath, verified, mismatches, cases: recomputed }, null, 2));
 if (mismatches.length) process.exitCode = 1;

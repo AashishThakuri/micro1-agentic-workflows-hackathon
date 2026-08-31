@@ -197,7 +197,6 @@ It has no typed scene schema, renderer, narration workflow, interaction contract
 
 The executable baseline is deliberately the common low-cost alternative: ask a general-purpose model for an explanation. Ocular does **not** claim that its ten-case run is a head-to-head evaluation against Veo or another commercial video generator. The pricing and benchmark results above are external evidence for the product-design problem; the repository evaluation isolates whether Ocular's agent workflow produces a more usable artifact than a direct prompt on the same task.
 
-
 ### Challenging case: transfer learning
 
 The fixed challenging prompt is:
@@ -206,7 +205,7 @@ The fixed challenging prompt is:
 
 A successful result must cover reusable features, knowledge transfer, frozen feature extraction, fine-tuning, small-data value, and domain mismatch.
 
-The first strict run exposed a real weakness: generated scenes had valid narration, objects, interactions, and renderer plans, but sometimes contained too few animation beats. We kept the failed result, added deterministic narration-linked timeline completion, and reran the same cases without relaxing the rubric. The complete workflow then passed 10/10.
+An early development run exposed sparse animation timelines, so Ocular added deterministic narration-linked timeline completion. The later reproducibility audit exposed a separate issue: one differential-equation response contained only one scene, producing 9/10. That complete failed run is preserved, the minimum two-scene contract is now verified and retried, and the same ten cases then passed 10/10 without relaxing the rubric.
 
 ## Improvement Changelog
 
@@ -281,7 +280,7 @@ Expected recorded headline result:
 ```text
 Direct-prompt baseline: 0/10 runnable visual lessons
 Ocular:                 10/10 runnable visual lessons
-Average keyword coverage: 95% for both systems
+Average keyword coverage: baseline 95%, Ocular 98%
 ```
 
 The harness prints all cases and exits with a nonzero status if any Ocular case fails the runnable-lesson contract. Set `OCULAR_URL` only when evaluating an origin other than `http://localhost:3000`.
@@ -292,7 +291,7 @@ The output artifact contains the complete baseline text, complete Ocular lesson 
 node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json
 ```
 
-Expected verifier result: `10` cases, baseline runnable `0`, Ocular runnable `10`, keyword coverage `95%` for both systems, and an empty `mismatches` array. The frozen raw run is the evidence behind [`evaluation/RESULTS.md`](evaluation/RESULTS.md); the Markdown table is not treated as the source of truth.
+Expected verifier result: `10` cases, baseline runnable `0`, Ocular runnable `10`, keyword coverage `95%` for the baseline and `98%` for Ocular, and an empty `mismatches` array. The frozen raw run is the evidence behind [`evaluation/RESULTS.md`](evaluation/RESULTS.md); the Markdown table is not treated as the source of truth.
 
 ### 4. Verify deterministic rendering
 
@@ -310,6 +309,10 @@ Representative sanitized trajectories show instructions, inputs, tool calls, too
 - [`traces/lesson-director-transfer-learning.md`](traces/lesson-director-transfer-learning.md)
 - [`traces/clarification-agent-transfer-learning.md`](traces/clarification-agent-transfer-learning.md)
 - [`traces/README.md`](traces/README.md)
+- [`evaluation/RESULTS.md`](evaluation/RESULTS.md) - all ten submitted results and challenging-case analysis
+- [`evaluation/artifacts/run-2026-08-31.json`](evaluation/artifacts/run-2026-08-31.json) - complete frozen baseline and Ocular outputs behind every submitted score
+- [`evaluation/artifacts/failed-run-2026-08-31-before-minimum-scene-check.json`](evaluation/artifacts/failed-run-2026-08-31-before-minimum-scene-check.json) - preserved 9/10 run that exposed the reliability gap
+- [`evaluation/VALIDATION.md`](evaluation/VALIDATION.md) - exact commands and observed lint, build, renderer-test, and score-verification outputs
 
 ## Repository structure
 

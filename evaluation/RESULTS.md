@@ -1,36 +1,38 @@
 # Recorded evaluation results
 
-Run date: 2026-08-31. Ten fixed cases, same topics and keyword rubric for both systems. No failed case was removed.
+Run date: 2026-08-31. Ten fixed cases, same topics and keyword rubric for both systems. No failed case was removed. The source of truth is the complete raw artifact at [`artifacts/run-2026-08-31.json`](artifacts/run-2026-08-31.json), produced from code commit `b58c10881ff113a9c10a0d8abdd6ce1a5f75d363`.
 
 | Metric | Direct-prompt baseline | Ocular | Change |
 | --- | ---: | ---: | ---: |
 | Runnable visual lessons | 0/10 | 10/10 | +100 percentage points |
-| Average concept-keyword coverage | 95% | 95% | 0 points |
-| Median planning latency | 5.95 s | 9.67 s | +3.72 s |
+| Average concept-keyword coverage | 95% | 98% | +3 points |
+| Median planning latency | 4.73 s | 7.40 s | +2.67 s |
 | Model fallback cases | N/A | 0/10 | All used the agent path |
 
-The result is intentionally specific: Ocular did **not** improve simple keyword inclusion, and it was slower. It improved the target learner outcome by converting equally complete subject coverage into a structured, playable artifact.
+The result is intentionally specific: Ocular improved keyword inclusion by only three points and was slower. Its meaningful improvement was the target learner outcome: converting subject coverage into a structured, playable artifact.
 
 ## Complete case results
 
 | Case | Baseline keywords | Baseline runnable | Ocular keywords | Ocular runnable | Scenes | Ocular latency |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Transfer learning (challenging case) | 75% | No | 75% | Yes | 3 | 10.46 s |
-| Mitosis | 100% | No | 100% | Yes | 4 | 10.48 s |
-| Derivative | 100% | No | 100% | Yes | 2 | 11.30 s |
-| Normal distribution | 100% | No | 100% | Yes | 3 | 9.67 s |
-| Differential equation | 75% | No | 100% | Yes | 2 | 7.78 s |
-| Breadth-first search | 100% | No | 75% | Yes | 2 | 6.85 s |
-| Photosynthesis | 100% | No | 100% | Yes | 2 | 9.01 s |
-| Supply and demand | 100% | No | 100% | Yes | 2 | 10.67 s |
-| Plate tectonics | 100% | No | 100% | Yes | 2 | 9.24 s |
-| DNA transcription | 100% | No | 100% | Yes | 3 | 7.37 s |
+| Transfer learning (challenging case) | 100% | No | 100% | Yes | 2 | 6.06 s |
+| Mitosis | 100% | No | 100% | Yes | 2 | 5.81 s |
+| Derivative | 75% | No | 100% | Yes | 2 | 7.61 s |
+| Normal distribution | 100% | No | 100% | Yes | 2 | 8.14 s |
+| Differential equation | 75% | No | 100% | Yes | 2 | 8.95 s |
+| Breadth-first search | 100% | No | 75% | Yes | 2 | 7.06 s |
+| Photosynthesis | 100% | No | 100% | Yes | 2 | 7.19 s |
+| Supply and demand | 100% | No | 100% | Yes | 2 | 7.60 s |
+| Plate tectonics | 100% | No | 100% | Yes | 2 | 7.20 s |
+| DNA transcription | 100% | No | 100% | Yes | 2 | 8.13 s |
 
 ## What the challenging case revealed
 
 The first transfer-learning run produced valid scenes, narration, objects, interactions, and renderer plans, but the model sometimes returned fewer animation beats than the prompt requested. The honest first score was therefore 0/10 on the strict runnable rubric because the same shortfall appeared across cases.
 
-We kept that failure as an experiment and changed the workflow: sparse timelines are now padded deterministically with narration-linked beats before the lesson reaches the client. The second complete run passed 10/10. This is a reliability improvement in the product, not a relaxed rubric.
+We documented that failure in the improvement changelog and changed the workflow: sparse timelines are now padded deterministically with narration-linked beats before the lesson reaches the client.
+
+The later reproducibility audit found a second real failure: one differential-equation response contained only one scene, producing 9/10. That complete failed run is preserved at [`artifacts/failed-run-2026-08-31-before-minimum-scene-check.json`](artifacts/failed-run-2026-08-31-before-minimum-scene-check.json). Ocular now rejects and retries model output that violates the two-scene contract, while the local fallback also produces two complementary scenes. The same ten cases then passed 10/10 without relaxing the rubric.
 
 ## Independent renderer result
 
@@ -41,7 +43,13 @@ The deterministic backend suite passes **21/21 templates**, covering mathematics
 Start Ocular, then run:
 
 ```bash
-node evaluation/run.mjs
+node evaluation/run.mjs --output evaluation/artifacts/reproduction.json
 ```
 
 The command exits nonzero if any Ocular case fails the runnable-lesson requirements.
+
+To rescore the submitted raw outputs without an API key:
+
+```bash
+node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json
+```
