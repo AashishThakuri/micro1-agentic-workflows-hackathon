@@ -228,13 +228,13 @@ The detailed record is preserved in [`IMPROVEMENT_CHANGELOG.md`](IMPROVEMENT_CHA
 
 ## Reproduce from a clean environment
 
-### Requirements
+### Requirements and tested toolchain
 
-- Node.js 22.13 or newer
-- pnpm 9 or newer
-- Python 3.12
-- uv
-- FFmpeg and the system libraries required by Manim
+- Node.js 22.11 or newer (**tested: 22.11.0**)
+- pnpm 9 (**tested: 9.15.4**; exact JavaScript dependencies are locked in `frontend/pnpm-lock.yaml`)
+- Python 3.12 (**tested renderer environment: 3.12.12**)
+- uv (**tested: 0.9.18**; exact Python dependencies are locked in `backend/uv.lock`)
+- FFmpeg (**tested: 7.1**) and the system libraries required by Manim
 - A Gemini API key
 
 ### 1. Clone and configure
@@ -273,7 +273,7 @@ First-time setup may take several minutes because scientific and animation depen
 Keep Ocular running, then from the repository root execute:
 
 ```bash
-node evaluation/run.mjs
+node evaluation/run.mjs --output evaluation/artifacts/reproduction.json
 ```
 
 Expected recorded headline result:
@@ -285,6 +285,14 @@ Average keyword coverage: 95% for both systems
 ```
 
 The harness prints all cases and exits with a nonzero status if any Ocular case fails the runnable-lesson contract. Set `OCULAR_URL` only when evaluating an origin other than `http://localhost:3000`.
+
+The output artifact contains the complete baseline text, complete Ocular lesson JSON, per-check rubric results, model selection, latencies, and the computed summary. To independently rescore the frozen submission run without an API key or network access:
+
+```bash
+node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json
+```
+
+Expected verifier result: `10` cases, baseline runnable `0`, Ocular runnable `10`, keyword coverage `95%` for both systems, and an empty `mismatches` array. The frozen raw run is the evidence behind [`evaluation/RESULTS.md`](evaluation/RESULTS.md); the Markdown table is not treated as the source of truth.
 
 ### 4. Verify deterministic rendering
 

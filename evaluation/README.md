@@ -28,7 +28,7 @@ Ten fixed cases span machine learning, biology, calculus, statistics, differenti
 Start Ocular locally, then from the repository root:
 
 ```bash
-node evaluation/run.mjs
+node evaluation/run.mjs --output evaluation/artifacts/reproduction.json
 ```
 
 Environment variables:
@@ -36,7 +36,15 @@ Environment variables:
 - `GEMINI_API_KEY` - optional override; otherwise loaded from `backend/.env`.
 - `OCULAR_URL` - optional application origin; defaults to `http://localhost:3000`.
 
-The harness prints every case and does not discard failures. A nonzero exit code means at least one Ocular case failed the runnable-lesson rubric.
+The harness prints every case, saves the complete baseline text and Ocular lesson output, and does not discard failures. A nonzero exit code means at least one Ocular case failed the runnable-lesson rubric.
+
+Recompute the submitted scores directly from the frozen raw outputs:
+
+```bash
+node evaluation/verify.mjs evaluation/artifacts/run-2026-08-31.json
+```
+
+This verifier requires no API key. It recomputes keyword coverage and every runnable-lesson structure check, compares the result with the embedded summary, and exits nonzero on a mismatch.
 
 ## Limitations
 

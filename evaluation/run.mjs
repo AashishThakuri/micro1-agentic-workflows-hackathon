@@ -1,5 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import process from "node:process";
+import { dirname, resolve } from "node:path";
 
 const rootUrl = process.env.OCULAR_URL || "http://localhost:3000";
 const cases = JSON.parse(await readFile(new URL("./cases.json", import.meta.url), "utf8"));
@@ -15,6 +16,11 @@ const env = Object.fromEntries(
     }),
 );
 const apiKey = process.env.GEMINI_API_KEY || env.GEMINI_API_KEY;
+const outputFlagIndex = process.argv.indexOf("--output");
+const outputPath =
+  outputFlagIndex >= 0 && process.argv[outputFlagIndex + 1]
+    ? resolve(process.cwd(), process.argv[outputFlagIndex + 1])
+    : null;
 
 if (!apiKey) {
   throw new Error("GEMINI_API_KEY is required in the environment or backend/.env.");
@@ -111,6 +117,9 @@ for (const [index, evaluationCase] of cases.entries()) {
     id: evaluationCase.id,
     baseline: {
       ok: baseline.ok,
+      model: baseline.model || null,
+      error: baseline.error || null,
+      text: baseline.text,
       keywordCoverage: keywordCoverage(baseline.text, evaluationCase.keywords),
       runnable: false,
       latencyMs: baseline.latencyMs,
@@ -120,6 +129,7 @@ for (const [index, evaluationCase] of cases.entries()) {
       ...inspected,
       latencyMs: solution.latencyMs,
       generation: solution.generation,
+      lesson: solution.lesson,
     },
   });
   console.log(
@@ -129,20 +139,59 @@ for (const [index, evaluationCase] of cases.entries()) {
 }
 
 const average = (values) => Math.round(values.reduce((sum, value) => sum + value, 0) / values.length);
+const median = (values) => {
+  const ordered = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(ordered.length / 2);
+  return ordered.length % 2
+    ? ordered[middle]
+    : Math.round((ordered[middle - 1] + ordered[middle]) / 2);
+};
 const summary = {
   cases: results.length,
   baselineRunnable: results.filter((result) => result.baseline.runnable).length,
   ocularRunnable: results.filter((result) => result.ocular.runnable).length,
   baselineKeywordCoveragePercent: average(results.map((result) => result.baseline.keywordCoverage * 100)),
   ocularKeywordCoveragePercent: average(results.map((result) => result.ocular.keywordCoverage * 100)),
-  baselineMedianLatencyMs: [...results].sort((a, b) => a.baseline.latencyMs - b.baseline.latencyMs)[Math.floor(results.length / 2)].baseline.latencyMs,
-  ocularMedianLatencyMs: [...results].sort((a, b) => a.ocular.latencyMs - b.ocular.latencyMs)[Math.floor(results.length / 2)].ocular.latencyMs,
+  baselineMedianLatencyMs: median(results.map((result) => result.baseline.latencyMs)),
+  ocularMedianLatencyMs: median(results.map((result) => result.ocular.latencyMs)),
   fallbackCases: results.filter((result) => result.ocular.generation !== "agent").map((result) => result.id),
+};
+
+const artifact = {
+  schemaVersion: 1,
+  generatedAt: new Date().toISOString(),
+  command: outputPath
+    ? `node evaluation/run.mjs --output ${process.argv[outputFlagIndex + 1]}`
+    : "node evaluation/run.mjs",
+  environment: {
+    node: process.version,
+    ocularUrl: rootUrl,
+    baselineModels,
+  },
+  rubric: {
+    primaryMetric: "runnable visual lesson completion",
+    requiredChecks: [
+      "atLeastTwoScenes",
+      "narration",
+      "visualObjects",
+      "animationTimeline",
+      "directManipulation",
+      "rendererPlan",
+    ],
+  },
+  summary,
+  results,
 };
 
 console.log("\nSUMMARY");
 console.log(JSON.stringify(summary, null, 2));
 console.log("\nDETAILS");
 console.log(JSON.stringify(results, null, 2));
+
+if (outputPath) {
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`, "utf8");
+  console.log(`\nWROTE ${outputPath}`);
+}
 
 if (summary.ocularRunnable !== results.length) process.exitCode = 1;
