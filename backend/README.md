@@ -1,11 +1,26 @@
 # Ocular backend
 
-Ocular's first server-side workflow lives in the frontend's Next-compatible API route at `frontend/app/api/lesson/route.ts`. It accepts topics, notes, and small PDFs, then asks Gemini for a structured visual lesson plan.
+This folder contains Ocular's deterministic subject-aware renderer. The web route in `frontend/app/api/lesson/route.ts` asks Gemini for a typed lesson plan; this service turns eligible scenes into verified animated media with Manim and subject libraries.
 
-Local credentials belong in this folder:
+Local credentials also belong in this folder:
 
 1. Copy `.env.example` to `.env`.
 2. Add a Gemini API key.
 3. Never commit `.env`; it is ignored by Git.
 
-The local frontend runtime reads this server-only environment file through `vite.config.ts`. Browser code cannot access the key. Future ingestion, retrieval, narration, and evaluation services can move into this backend as their contracts stabilize.
+The local frontend runtime reads this server-only environment file through `vite.config.ts`. Browser code cannot access the key.
+
+Run tests with:
+
+```bash
+uv sync
+uv run pytest -q
+```
+
+Run only the renderer service with:
+
+```bash
+uv run python server.py
+```
+
+The combined `pnpm dev` command in `frontend/` starts both the renderer and the web application.

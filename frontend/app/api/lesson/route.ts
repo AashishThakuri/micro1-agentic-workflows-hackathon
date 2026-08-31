@@ -1,4 +1,4 @@
-import { ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "./visual-language";
+import { ensureLessonAnimationCoverage, ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "./visual-language";
 import { GEMINI_TEXT_MODELS, parseGeminiJson } from "./gemini-json";
 
 type LessonRequest = {
@@ -253,11 +253,11 @@ export async function POST(request: Request) {
 
   try {
     const lesson = await generateWithFallback(apiKey, [{ role: "user", parts }]);
-    return Response.json(removeNarrationDashes(lesson));
+    return Response.json(removeNarrationDashes(ensureLessonAnimationCoverage(lesson)));
   } catch (error) {
     console.error("Lesson generation error", error);
     const fallbackSource = sourceText || input.file?.name || "the source material";
-    return Response.json(removeNarrationDashes(buildLocalLesson(fallbackSource)), {
+    return Response.json(removeNarrationDashes(ensureLessonAnimationCoverage(buildLocalLesson(fallbackSource))), {
       headers: { "X-Ocular-Generation": "local-fallback" },
     });
   }

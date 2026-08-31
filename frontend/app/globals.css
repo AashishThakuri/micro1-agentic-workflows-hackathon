@@ -3448,3 +3448,426 @@ body:has(.workbench-shell) {
   .video-direct-control { right: 0.35rem; bottom: 0.35rem; left: 0.35rem; min-width: 0; }
   .video-direct-control label { overflow: hidden; max-width: 6rem; text-overflow: ellipsis; white-space: nowrap; }
 }
+
+/* Single-viewport lesson studio */
+html:has(.workbench-shell),
+body:has(.workbench-shell) {
+  width: 100%;
+  height: 100svh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workbench-shell {
+  display: grid;
+  height: 100svh;
+  min-height: 0;
+  grid-template-rows: clamp(3.7rem, 8svh, 4.6rem) minmax(0, 1fr);
+  overflow: hidden;
+  letter-spacing: 0.018em;
+}
+
+.workbench-header {
+  position: relative;
+  top: auto;
+  height: auto;
+  min-height: 0;
+}
+
+.workbench-brand { letter-spacing: 0.018em; }
+
+.workbench-source-toggle {
+  display: none;
+  padding: 0.55rem 0.72rem;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: transparent;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.workbench-grid {
+  min-height: 0;
+  height: 100%;
+  grid-template-columns: minmax(18rem, 27vw) minmax(0, 1fr);
+  gap: clamp(0.45rem, 0.8vw, 0.8rem);
+  padding: clamp(0.45rem, 0.8vw, 0.8rem);
+  overflow: hidden;
+  background: var(--paper-deep);
+}
+
+.lesson-source-panel {
+  position: relative;
+  top: auto;
+  display: grid;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 1.5px solid var(--ink);
+  isolation: isolate;
+  background: var(--ink);
+  clip-path: polygon(1rem 0, calc(100% - 3.5rem) 0, calc(100% - 2.6rem) 0.9rem, 100% 0.9rem, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%, 0 1rem);
+}
+
+.lesson-source-panel::before {
+  position: absolute;
+  z-index: 0;
+  inset: 1.5px;
+  background: var(--paper);
+  clip-path: polygon(0.9rem 0, calc(100% - 3.35rem) 0, calc(100% - 2.5rem) 0.85rem, 100% 0.85rem, 100% calc(100% - 0.9rem), calc(100% - 0.9rem) 100%, 0 100%, 0 0.9rem);
+  content: "";
+  pointer-events: none;
+}
+
+.lesson-source-panel > * { position: relative; z-index: 1; }
+
+.source-panel-heading {
+  min-height: 0;
+  padding: clamp(0.85rem, 1.8svh, 1.2rem) clamp(0.9rem, 1.4vw, 1.35rem);
+}
+
+.source-panel-heading h1 {
+  margin: 0 0 clamp(0.45rem, 1svh, 0.7rem);
+  font-size: clamp(2.25rem, 3vw, 3.7rem);
+}
+
+.source-panel-heading p {
+  font-size: clamp(0.74rem, 1.15vw, 0.88rem);
+  letter-spacing: 0.018em;
+}
+
+.lesson-source-panel form {
+  display: grid;
+  height: auto;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.workbench-source-tabs button {
+  display: grid;
+  min-height: clamp(2.8rem, 6.3svh, 3.5rem);
+  grid-template-columns: 1fr;
+  letter-spacing: 0.035em;
+}
+
+.workbench-source-entry {
+  min-height: 0;
+  padding: clamp(0.85rem, 1.8svh, 1.25rem) clamp(0.9rem, 1.4vw, 1.35rem);
+  overflow: hidden;
+}
+
+.workbench-source-entry textarea {
+  min-height: 0;
+  letter-spacing: 0.018em;
+}
+
+.workbench-pdf { min-height: 0; }
+
+.workbench-message {
+  min-height: clamp(2.5rem, 5.5svh, 3.15rem);
+  padding: 0.55rem clamp(0.9rem, 1.4vw, 1.35rem);
+  letter-spacing: 0.018em;
+}
+
+.workbench-build {
+  min-height: clamp(3.2rem, 7svh, 4.15rem);
+  padding: 0.8rem clamp(0.9rem, 1.4vw, 1.35rem);
+}
+
+.interactive-video-panel {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto minmax(5.8rem, 15svh);
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  background: var(--ink);
+  clip-path: polygon(0 0, calc(100% - 3.4rem) 0, calc(100% - 2.5rem) 0.9rem, 100% 0.9rem, 100% 100%, 0 100%);
+}
+
+.interactive-video-panel::before {
+  position: absolute;
+  z-index: 0;
+  inset: 1.5px;
+  background: var(--paper);
+  clip-path: polygon(0 0, calc(100% - 3.25rem) 0, calc(100% - 2.4rem) 0.85rem, 100% 0.85rem, 100% 100%, 0 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.interactive-video-panel > * { position: relative; z-index: 1; }
+
+.video-panel-heading {
+  min-height: clamp(3.35rem, 7svh, 4.35rem);
+  padding: 0.55rem clamp(0.8rem, 1.6vw, 1.35rem);
+}
+
+.video-panel-heading h2,
+.video-empty h3,
+.video-building h3,
+.scene-visual-title,
+.comment-heading h3,
+.comment-entry textarea {
+  letter-spacing: 0.018em;
+}
+
+.video-meta strong { letter-spacing: 0.018em; }
+
+.video-stage {
+  width: auto;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: clamp(0.4rem, 0.75vw, 0.7rem);
+  isolation: isolate;
+  border: 0;
+  background: var(--ink);
+  clip-path: polygon(1rem 0, calc(100% - 4rem) 0, calc(100% - 3rem) 1rem, 100% 1rem, 100% calc(100% - 1rem), calc(100% - 1rem) 100%, 0 100%, 0 1rem);
+}
+
+.video-stage::before {
+  position: absolute;
+  z-index: 0;
+  inset: 1.5px;
+  background: #d8d1c3;
+  background-image:
+    linear-gradient(rgb(23 23 23 / 7%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(23 23 23 / 7%) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+  clip-path: polygon(0.9rem 0, calc(100% - 3.85rem) 0, calc(100% - 2.9rem) 0.95rem, 100% 0.95rem, 100% calc(100% - 0.9rem), calc(100% - 0.9rem) 100%, 0 100%, 0 0.9rem);
+  content: "";
+  pointer-events: none;
+}
+
+.video-stage > * { position: relative; z-index: 1; }
+.video-stage > .scene-subtitle { position: absolute; }
+
+.video-empty,
+.video-building {
+  max-width: min(90%, 38rem);
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.empty-canvas-mark {
+  display: grid;
+  width: min(14rem, 42vw);
+  grid-template-columns: 1.1fr 0.72fr 1.4fr;
+  gap: 0.45rem;
+  align-items: end;
+  transform: skewX(-7deg);
+}
+
+.empty-canvas-mark i {
+  display: block;
+  height: clamp(2.2rem, 6vw, 4rem);
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  clip-path: polygon(0.65rem 0, 100% 0, calc(100% - 0.65rem) 100%, 0 100%);
+}
+
+.empty-canvas-mark i:nth-child(2) {
+  height: clamp(3.1rem, 8vw, 5.4rem);
+  background: var(--yellow);
+}
+
+.empty-canvas-mark i:nth-child(3) {
+  height: clamp(1.6rem, 4.5vw, 3rem);
+  background: var(--pink);
+}
+
+.video-empty h3,
+.video-building h3 {
+  margin-top: clamp(0.8rem, 2svh, 1.35rem);
+  font-size: clamp(1.55rem, 2.8vw, 3rem);
+}
+
+.video-controls {
+  min-height: clamp(3.4rem, 7.4svh, 4.2rem);
+  padding: 0.5rem clamp(0.7rem, 1.6vw, 1.35rem);
+  border-top: 0;
+}
+
+.scene-comment-panel {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(10rem, 0.55fr) minmax(15rem, 1.45fr) auto;
+  margin: 0 clamp(0.4rem, 0.75vw, 0.7rem) clamp(0.4rem, 0.75vw, 0.7rem);
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  background: var(--ink);
+  clip-path: polygon(0 0, calc(100% - 2.7rem) 0, calc(100% - 1.9rem) 0.8rem, 100% 0.8rem, 100% 100%, 0.8rem 100%, 0 calc(100% - 0.8rem));
+  overflow: hidden;
+}
+
+.scene-comment-panel::before {
+  position: absolute;
+  z-index: 0;
+  inset: 1.5px;
+  background: var(--paper);
+  clip-path: polygon(0 0, calc(100% - 2.55rem) 0, calc(100% - 1.8rem) 0.75rem, 100% 0.75rem, 100% 100%, 0.75rem 100%, 0 calc(100% - 0.75rem));
+  content: "";
+  pointer-events: none;
+}
+
+.scene-comment-panel > * { position: relative; z-index: 1; }
+
+/* The clipped silhouettes carry the hierarchy; avoid straight ruled dividers. */
+.workbench-header,
+.source-panel-heading,
+.workbench-source-tabs,
+.workbench-source-entry,
+.workbench-message,
+.video-panel-heading,
+.video-controls,
+.comment-heading,
+.comment-entry,
+.scene-comment-panel > button {
+  border: 0;
+}
+
+.workbench-source-tabs {
+  gap: 0.22rem;
+  padding: 0.22rem;
+  background: var(--paper-deep);
+}
+
+.workbench-source-tabs button { border: 0; }
+.workbench-source-tabs button:last-child { border-right: 0; }
+
+.video-stage::before {
+  background-color: #d8d1c3;
+  background-image: radial-gradient(circle, rgb(23 23 23 / 14%) 0 1px, transparent 1.2px);
+  background-size: 1.35rem 1.35rem;
+}
+
+.comment-heading,
+.comment-entry,
+.scene-comment-panel > button {
+  min-height: 0;
+  padding: clamp(0.65rem, 1.5svh, 1rem) clamp(0.75rem, 1.4vw, 1.2rem);
+}
+
+.comment-heading h3 { margin-top: 0; }
+.comment-entry { gap: 0.3rem; }
+.comment-entry textarea { min-height: 0; }
+.scene-comment-panel > button { min-width: clamp(8rem, 12vw, 11rem); }
+
+@media (max-height: 43rem) and (min-width: 52.01rem) {
+  .source-panel-heading p { display: none; }
+  .source-panel-heading h1 { margin-bottom: 0; font-size: clamp(2rem, 4.7svh, 2.8rem); }
+  .interactive-video-panel { grid-template-rows: auto minmax(0, 1fr) auto minmax(5rem, 13svh); }
+  .video-panel-heading { min-height: 3.25rem; }
+  .video-controls { min-height: 3.25rem; }
+  .transport-button { height: 2rem; min-width: 2rem; }
+  .play-button { width: 2.45rem; }
+}
+
+@media (max-width: 52rem) {
+  .workbench-header {
+    grid-template-columns: 1fr auto auto;
+    gap: 0.55rem;
+  }
+
+  .workbench-header-status { display: none; }
+  .workbench-source-toggle { display: inline-flex; }
+
+  .workbench-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: clamp(0.35rem, 1.4vw, 0.6rem);
+  }
+
+  .lesson-source-panel {
+    position: absolute;
+    z-index: 20;
+    inset: clamp(0.35rem, 1.4vw, 0.6rem);
+    width: auto;
+    height: auto;
+    border: 1.5px solid var(--ink);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(calc(-100% - 1rem));
+    transition: opacity 180ms ease, transform 220ms ease;
+  }
+
+  .source-is-open .lesson-source-panel {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  .interactive-video-panel {
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto minmax(5.4rem, 14svh);
+  }
+
+  .video-stage { min-height: 0 !important; }
+  .scene-visual { width: 100%; }
+  .scene-comment-panel {
+    grid-template-columns: minmax(8rem, 0.55fr) minmax(10rem, 1.45fr) auto;
+  }
+
+  .scene-comment-panel > button {
+    grid-column: auto;
+    min-height: 0;
+    border-top: 0;
+  }
+}
+
+@media (max-width: 36rem) {
+  .workbench-shell { grid-template-rows: clamp(3.5rem, 8svh, 4rem) minmax(0, 1fr); }
+  .workbench-header { height: auto; min-height: 0; grid-template-columns: 1fr auto auto; }
+  .workbench-home { font-size: 0; }
+  .workbench-home span { font-size: 0.9rem; }
+  .workbench-source-toggle { padding-inline: 0.55rem; font-size: 0.54rem; }
+
+  .source-panel-heading { padding: 0.8rem; }
+  .source-panel-heading h1 { font-size: clamp(2.15rem, 12vw, 3.1rem); }
+  .source-panel-heading p { font-size: 0.72rem; }
+  .workbench-source-entry { min-height: 0; padding: 0.8rem; }
+  .workbench-source-entry textarea { min-height: 0; font-size: clamp(1.05rem, 5.8vw, 1.35rem); }
+  .workbench-message,
+  .workbench-build { padding-inline: 0.8rem; }
+
+  .video-panel-heading { min-height: 3.2rem; padding: 0.45rem 0.65rem; }
+  .video-panel-heading h2 { font-size: clamp(1rem, 5vw, 1.3rem); }
+  .video-meta { min-width: 4.3rem; }
+  .video-meta span { display: none; }
+
+  .interactive-video-panel { grid-template-rows: auto minmax(0, 1fr) auto minmax(4.8rem, 13svh); }
+  .video-stage { margin: 0.35rem; }
+  .video-empty p,
+  .video-building p { font-size: 0.72rem; }
+
+  .video-controls {
+    grid-template-columns: repeat(4, auto) minmax(4rem, 1fr);
+    gap: 0.3rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .video-controls > .transport-button:first-child,
+  .audio-status,
+  .next-scene { display: none; }
+  .video-time { grid-column: auto; }
+  .transport-button { min-width: 2rem; height: 2rem; padding-inline: 0.3rem; }
+  .play-button { width: 2.4rem; }
+
+  .scene-comment-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin: 0 0.35rem 0.35rem;
+  }
+
+  .comment-heading { display: none; }
+  .comment-entry { min-height: 0; border: 0; padding: 0.6rem; }
+  .comment-entry label { font-size: 0.5rem; }
+  .comment-entry textarea { font-size: 0.72rem; }
+  .scene-comment-panel > button { width: auto; min-width: 3.5rem; min-height: 0; padding: 0.55rem; }
+  .scene-comment-panel > button span:first-child { display: none; }
+}

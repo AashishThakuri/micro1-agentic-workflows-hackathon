@@ -1,4 +1,4 @@
-import { ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "../visual-language";
+import { ensureSceneAnimationCoverage, ocularVisualLanguage, removeNarrationDashes, sceneProperties } from "../visual-language";
 import { GEMINI_TEXT_MODELS, parseGeminiJson } from "../gemini-json";
 
 type VisualElement = {
@@ -60,13 +60,15 @@ export async function POST(request: Request) {
   }
 
   const prompt = [
-    "You revise one scene in an interactive Ocular visual lesson.",
+    "You create one follow-up clarification scene for an interactive Ocular visual lesson.",
     `Lesson: ${input.lessonTitle || "Untitled lesson"}`,
     `Current scene: ${JSON.stringify(input.scene)}`,
     `Learner's exact doubt or requested change: ${input.comment.trim()}`,
-    "Rebuild only this scene so the learner's doubt is addressed directly and precisely.",
-    "You may completely reinvent this scene's metaphor, composition, objects, connections, motion, narration, and duration. Do not alter the rest of the lesson.",
-    "Make the revised visual directly resolve the learner's doubt instead of merely adding more words.",
+    "Create a new scene that will be appended to the end of the lesson. Do not rewrite or summarize the original scene.",
+    "Use the learner's exact doubt as the sole teaching target. Resolve it directly, step by step, with a simpler visual model than before.",
+    "You may completely reinvent the metaphor, composition, objects, connections, motion, and duration for this clarification.",
+    "Make the follow-up visual demonstrate the answer instead of merely adding more words.",
+    "Begin narration directly with the explanation. The application adds its own spoken transition before your narration.",
     "Keep narration free of em dashes and en dashes. Use commas and short sentences.",
     "Create a meaningful direct manipulation that lets the learner change the mechanism and immediately see its consequence.",
     "Synchronize a topic-appropriate visual action to every meaningful narrated phrase. The action grammar is general and must be chosen from the learner's actual subject, never copied from an example topic.",
@@ -106,7 +108,7 @@ export async function POST(request: Request) {
       const text = payload.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) continue;
       try {
-        return Response.json(removeNarrationDashes(parseGeminiJson<Scene>(text)));
+        return Response.json(removeNarrationDashes(ensureSceneAnimationCoverage(parseGeminiJson<Scene>(text))));
       } catch (error) {
         console.error("Gemini refinement JSON was invalid", model, error);
       }
@@ -115,5 +117,5 @@ export async function POST(request: Request) {
     }
   }
 
-  return Response.json({ error: "This scene could not be revised yet. Please try again." }, { status: 502 });
+  return Response.json({ error: "This follow-up explanation could not be created yet. Please try again." }, { status: 502 });
 }

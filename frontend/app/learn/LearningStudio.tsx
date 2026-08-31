@@ -659,6 +659,7 @@ export function LearningStudio() {
   const [interactionValues, setInteractionValues] = useState<Record<string, number>>({});
   const [precisionRenders, setPrecisionRenders] = useState<Record<string, PrecisionRender>>({});
   const [commentPins, setCommentPins] = useState<Record<string, VideoCommentPin>>({});
+  const [sourcePanelOpen, setSourcePanelOpen] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const commentRef = useRef<HTMLTextAreaElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -1054,6 +1055,7 @@ export function LearningStudio() {
       setStatusMessage("Preparing every visual before playback…");
       await preparePrecisionLesson(nextLesson.scenes);
       setWorkState("ready");
+      setSourcePanelOpen(false);
       setStatusMessage("Lesson ready. Every visual is prepared.");
     } catch (error) {
       setWorkState("error");
@@ -1120,81 +1122,82 @@ export function LearningStudio() {
       return;
     }
 
+    const sourceScene = activeScene;
+    const question = comment.trim();
+    const focus = commentPins[sourceScene.id]?.label || selectedItem || sourceScene.title;
+    audioRef.current?.pause();
     setRefineState("working");
     setIsPlaying(false);
+    setAudioState("idle");
+    setStatusMessage("Preparing a clearer follow-up for the end of your lesson…");
+    setComment("");
+    setSelectedItem("");
+    setCommentPins((current) => {
+      const next = { ...current };
+      delete next[sourceScene.id];
+      return next;
+    });
+
     try {
       const response = await fetch("/api/lesson/refine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessonTitle: lesson.title, scene: activeScene, comment }),
+        body: JSON.stringify({ lessonTitle: lesson.title, scene: sourceScene, comment: question }),
       });
       const result = (await response.json()) as Omit<Scene, "id"> & { error?: string };
-      if (!response.ok || result.error) throw new Error(result.error || "This scene could not be revised.");
+      if (!response.ok || result.error) throw new Error(result.error || "This follow-up could not be created.");
 
-      const revisionAudioId = `${activeScene.id}-revision-${Date.now()}`;
+      const followUpId = `${sourceScene.id}-follow-up-${Date.now()}`;
       const inferredRevisionRenderSpec = fallbackRenderSpec(result);
       const revisionRenderSpec = !result.renderSpec
         || inferredRevisionRenderSpec.template === "cell_division"
         || (result.renderSpec.template === "concept" && inferredRevisionRenderSpec.template !== "concept")
         ? inferredRevisionRenderSpec
         : result.renderSpec;
-      const revisionCandidate: Scene = {
+      const spokenTransition = `Oh, so you have a question about ${focus}. Let's slow it down and learn it in a simpler, clearer way.`;
+      const followUpCandidate: Scene = {
         ...result,
-        id: revisionAudioId,
-        narration: cleanNarration(result.narration),
-        durationSeconds: Math.max(8, Number(result.durationSeconds) || activeScene.durationSeconds),
+        id: followUpId,
+        title: result.title || `A clearer look at ${focus}`,
+        narration: cleanNarration(`${spokenTransition} ${result.narration}`),
+        durationSeconds: Math.max(10, Number(result.durationSeconds) || sourceScene.durationSeconds),
         animationBeats: normalizeAnimationBeats(result.animationBeats, result.visualElements?.length || 0),
         interaction: normalizeInteraction(result.interaction, result.visualElements?.length || 0),
         renderSpec: revisionRenderSpec,
-        revision: comment.trim(),
+        revision: question,
       };
-      const revisionAudio = await getSceneAudioUrl(revisionCandidate);
-      const revisedScene: Scene = {
-        ...revisionCandidate,
-        id: activeScene.id,
+      await getSceneAudioUrl(followUpCandidate);
+      const followUpScene: Scene = {
+        ...followUpCandidate,
         durationSeconds: Math.max(
-          8,
-          Math.ceil(audioDurationRef.current.get(revisionAudioId) ?? revisionCandidate.durationSeconds),
+          10,
+          Math.ceil(audioDurationRef.current.get(followUpId) ?? followUpCandidate.durationSeconds),
         ),
       };
 
-      const previousAudio = audioCacheRef.current.get(activeScene.id);
-      if (previousAudio) URL.revokeObjectURL(previousAudio);
-      audioCacheRef.current.delete(activeScene.id);
-      audioCacheRef.current.delete(revisionAudioId);
-      audioCacheRef.current.set(activeScene.id, revisionAudio);
-      audioDurationRef.current.delete(activeScene.id);
-      audioDurationRef.current.set(activeScene.id, revisedScene.durationSeconds);
-      audioDurationRef.current.delete(revisionAudioId);
-      audioUnavailableRef.current.delete(activeScene.id);
-      audioUnavailableRef.current.delete(revisionAudioId);
-      if (loadedSceneIdRef.current === activeScene.id) loadedSceneIdRef.current = "";
+      setStatusMessage("Rendering the follow-up animation…");
+      await preparePrecisionScene(followUpScene);
 
-      setInteractionValues((current) => ({ ...current, [activeScene.id]: revisedScene.interaction.defaultValue }));
-      setLesson((current) => {
-        if (!current) return current;
-        const scenes = [...current.scenes];
-        scenes[activeSceneIndex] = revisedScene;
-        return { ...current, scenes };
-      });
-      setComment("");
-      setSelectedItem("");
-      setCommentPins((current) => {
-        const next = { ...current };
-        delete next[activeScene.id];
-        return next;
-      });
+      const currentLesson = lessonRef.current ?? lesson;
+      const nextLesson = { ...currentLesson, scenes: [...currentLesson.scenes, followUpScene] };
+      const followUpIndex = nextLesson.scenes.length - 1;
+      lessonRef.current = nextLesson;
+      setLesson(nextLesson);
+      setInteractionValues((current) => ({
+        ...current,
+        [followUpScene.id]: followUpScene.interaction.defaultValue,
+      }));
+      loadedSceneIdRef.current = "";
+      setActiveSceneIndex(followUpIndex);
+      activeSceneIndexRef.current = followUpIndex;
       setSceneProgress(0);
       setRefineState("done");
-      precisionRequestRef.current.delete(activeScene.id);
-      setPrecisionRenders((current) => {
-        const next = { ...current };
-        delete next[activeScene.id];
-        return next;
-      });
-      void preparePrecisionScene(revisedScene);
+      setStatusMessage("Your clearer explanation was added to the end of the lesson.");
+      await startSceneAudio(followUpIndex);
     } catch {
+      setComment(question);
       setRefineState("error");
+      setStatusMessage("The follow-up could not be prepared yet. Your question is ready to retry.");
     }
   }
 
@@ -1206,13 +1209,20 @@ export function LearningStudio() {
           <span className={workState === "building" ? "is-working" : ""} />
           {workState === "building" ? "Building lesson" : lesson ? "Lesson studio" : "New lesson"}
         </div>
+        <button
+          aria-expanded={sourcePanelOpen}
+          className="workbench-source-toggle"
+          onClick={() => setSourcePanelOpen((current) => !current)}
+          type="button"
+        >
+          {sourcePanelOpen ? "Close source" : "Source"}
+        </button>
         <Link className="workbench-home" href="/">Back home <span aria-hidden="true">↗</span></Link>
       </header>
 
-      <div className="workbench-grid">
+      <div className={`workbench-grid ${sourcePanelOpen ? "source-is-open" : ""}`}>
         <aside className="lesson-source-panel">
           <div className="source-panel-heading">
-            <span>01 / Source</span>
             <h1>Make a visual lesson.</h1>
             <p>Give Ocular a question, rough notes, or a PDF. The lesson grows only as long as the material needs.</p>
           </div>
@@ -1220,7 +1230,7 @@ export function LearningStudio() {
           <form onSubmit={buildLesson}>
             <fieldset className="workbench-source-tabs">
               <legend className="sr-only">Choose source type</legend>
-              {sourceModes.map((item, index) => (
+              {sourceModes.map((item) => (
                 <button
                   className={mode === item.id ? "is-active" : ""}
                   key={item.id}
@@ -1228,7 +1238,7 @@ export function LearningStudio() {
                   type="button"
                   aria-pressed={mode === item.id}
                 >
-                  <span>{String(index + 1).padStart(2, "0")}</span>{item.label}
+                  {item.label}
                 </button>
               ))}
             </fieldset>
@@ -1265,11 +1275,6 @@ export function LearningStudio() {
               )}
             </div>
 
-            <div className="adaptive-length-row">
-              <span className="adaptive-mark" aria-hidden="true">↔</span>
-              <span><strong>Adaptive length</strong><small>No fixed duration or scene limit</small></span>
-            </div>
-
             <output className={`workbench-message is-${workState}`}>{statusMessage || "Your source stays private to this session."}</output>
 
             <button className="workbench-build" disabled={workState === "building"} type="submit">
@@ -1282,7 +1287,6 @@ export function LearningStudio() {
         <section className="interactive-video-panel" aria-label="Interactive lesson video">
           <div className="video-panel-heading">
             <div>
-              <span>02 / Interactive lesson</span>
               <h2>{lesson?.title || "Your finished lesson appears here."}</h2>
             </div>
             <div className="video-meta">
@@ -1294,9 +1298,7 @@ export function LearningStudio() {
           <div className={`video-stage is-${workState}`}>
             {!activeScene && workState !== "building" && (
               <div className="video-empty">
-                <div className="empty-storyboard" aria-hidden="true">
-                  <span>01</span><i /><span>02</span><i /><span>…</span>
-                </div>
+                <div className="empty-canvas-mark" aria-hidden="true"><i /><i /><i /></div>
                 <h3>Source in. Understanding out.</h3>
                 <p>The source controls are always visible on the left. The generated lesson will replace this canvas.</p>
               </div>
@@ -1369,13 +1371,11 @@ export function LearningStudio() {
               onClick={() => chooseScene(activeSceneIndex + 1)}
               type="button"
             >→|</button>
-            <span className="keyboard-hint">Space pause · ←/→ 10s · Shift + ←/→ scene · &gt; speed</span>
           </div>
 
           <form className="scene-comment-panel" id="scene-comment-form" onSubmit={refineScene}>
             <div className="comment-heading">
-              <span>04 / Ask this scene</span>
-              <h3>{activeScene ? `Change “${activeScene.title}”` : "Select a scene to question it"}</h3>
+              <h3>{activeScene ? `Question “${activeScene.title}”` : "Select a scene to question it"}</h3>
             </div>
             <div className="comment-entry">
               <label htmlFor="scene-comment">Tell AI exactly what is unclear or click any visual item above.</label>
@@ -1390,7 +1390,7 @@ export function LearningStudio() {
               />
             </div>
             <button disabled={!activeScene || !comment.trim() || refineState === "working"} type="submit">
-              <span>{refineState === "working" ? "Rebuilding only this scene" : refineState === "done" ? "Scene rebuilt" : "Refine this scene"}</span>
+              <span>{refineState === "working" ? "Preparing your follow-up" : refineState === "done" ? "Explanation added to the end" : "Explain this doubt"}</span>
               <span aria-hidden="true">{refineState === "working" ? "···" : "↻"}</span>
             </button>
             {refineState === "error" && <p className="comment-error">Add a precise doubt, then try again.</p>}

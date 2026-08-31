@@ -128,6 +128,69 @@ export const sceneProperties = {
   },
 };
 
+type LooseAnimationBeat = {
+  atPercent?: unknown;
+  targetIndex?: unknown;
+  relatedIndex?: unknown;
+  action?: unknown;
+  narrationCue?: unknown;
+};
+
+type LooseScene = {
+  narration?: unknown;
+  visualElements?: unknown;
+  animationBeats?: unknown;
+};
+
+const fallbackBeatActions = ["draw", "highlight", "connect", "transform", "compare", "reveal"] as const;
+
+function narrationCueAt(words: string[], index: number, count: number) {
+  if (!words.length) return "the visual changes";
+  const start = Math.min(words.length - 1, Math.floor((index / Math.max(1, count)) * words.length));
+  return words.slice(start, Math.min(words.length, start + 5)).join(" ");
+}
+
+export function ensureSceneAnimationCoverage<T>(value: T): T {
+  if (!value || typeof value !== "object") return value;
+  const scene = value as LooseScene;
+  const elements = Array.isArray(scene.visualElements) ? scene.visualElements : [];
+  const elementCount = Math.max(1, elements.length);
+  const existing = Array.isArray(scene.animationBeats)
+    ? (scene.animationBeats.filter((beat) => beat && typeof beat === "object") as LooseAnimationBeat[])
+    : [];
+  const targetCount = Math.max(4, Math.min(12, elementCount * 2));
+  if (existing.length >= targetCount) return value;
+
+  const narration = typeof scene.narration === "string" ? scene.narration : "";
+  const words = narration.replace(/[^\p{L}\p{N}'-]+/gu, " ").trim().split(/\s+/).filter(Boolean);
+  const beats = [...existing];
+  while (beats.length < targetCount) {
+    const index = beats.length;
+    const action = fallbackBeatActions[index % fallbackBeatActions.length];
+    const targetIndex = index % elementCount;
+    const relational = action === "connect" || action === "transform" || action === "compare";
+    beats.push({
+      atPercent: Math.round(8 + (index * 84) / Math.max(1, targetCount - 1)),
+      targetIndex,
+      relatedIndex: relational && elementCount > 1 ? (targetIndex + 1) % elementCount : -1,
+      action,
+      narrationCue: narrationCueAt(words, index, targetCount),
+    });
+  }
+
+  return { ...(value as Record<string, unknown>), animationBeats: beats } as T;
+}
+
+export function ensureLessonAnimationCoverage<T>(value: T): T {
+  if (!value || typeof value !== "object") return value;
+  const lesson = value as { scenes?: unknown };
+  if (!Array.isArray(lesson.scenes)) return value;
+  return {
+    ...(value as Record<string, unknown>),
+    scenes: lesson.scenes.map((scene) => ensureSceneAnimationCoverage(scene)),
+  } as T;
+}
+
 export function removeNarrationDashes<T>(value: T): T {
   if (typeof value === "string") return value.replace(/[—–]/g, ",") as T;
   if (Array.isArray(value)) return value.map(removeNarrationDashes) as T;

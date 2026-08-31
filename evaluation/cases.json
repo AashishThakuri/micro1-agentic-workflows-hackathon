@@ -1,0 +1,52 @@
+[
+  {
+    "id": "transfer-learning",
+    "topic": "Explain transfer learning to a beginner. Show how a neural network trained to recognize everyday objects can reuse learned visual features to classify plant diseases with only a small labeled dataset. Contrast freezing the feature extractor with fine-tuning, and explain when transfer learning helps or fails.",
+    "keywords": ["feature", "freeze", "fine-tun", "plant"]
+  },
+  {
+    "id": "mitosis",
+    "topic": "Explain mitosis from chromosome duplication through cytokinesis, including spindle fibers and sister chromatid separation.",
+    "keywords": ["chromosome", "spindle", "chromatid", "cytokinesis"]
+  },
+  {
+    "id": "derivative",
+    "topic": "Explain a derivative as instantaneous rate of change using a moving tangent line on a curve.",
+    "keywords": ["rate", "tangent", "slope", "curve"]
+  },
+  {
+    "id": "normal-distribution",
+    "topic": "Explain how mean and standard deviation change a normal distribution and what the area under the curve means.",
+    "keywords": ["mean", "standard deviation", "area", "probability"]
+  },
+  {
+    "id": "differential-equation",
+    "topic": "Explain how a differential equation connects a system's current state to its rate of change using cooling as the example.",
+    "keywords": ["state", "rate", "temperature", "equilibrium"]
+  },
+  {
+    "id": "breadth-first-search",
+    "topic": "Explain breadth-first search on a graph, including the queue, visited nodes, neighbors, and shortest unweighted paths.",
+    "keywords": ["queue", "visited", "neighbor", "shortest"]
+  },
+  {
+    "id": "photosynthesis",
+    "topic": "Explain how light, water, and carbon dioxide become glucose and oxygen during photosynthesis.",
+    "keywords": ["light", "water", "carbon dioxide", "glucose"]
+  },
+  {
+    "id": "supply-demand",
+    "topic": "Explain how supply and demand interact to form an equilibrium price and quantity, then show what a demand increase changes.",
+    "keywords": ["supply", "demand", "price", "equilibrium"]
+  },
+  {
+    "id": "plate-tectonics",
+    "topic": "Explain plate tectonics using mantle motion and convergent, divergent, and transform boundaries.",
+    "keywords": ["plate", "mantle", "convergent", "divergent"]
+  },
+  {
+    "id": "transcription",
+    "topic": "Explain DNA transcription, including template DNA, RNA polymerase, complementary RNA bases, and termination.",
+    "keywords": ["dna", "rna polymerase", "complementary", "termination"]
+  }
+]
