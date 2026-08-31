@@ -25,7 +25,7 @@ No action occurs until the learner submits this question.
 ## Retry behavior
 
 - Generation failure preserves the lesson and shows a retryable message.
-- Renderer or narration failure does not delete the original scene.
+- Renderer failure does not delete the original scene. A temporary narration failure no longer blocks the valid follow-up; audio is deferred until quota returns.
 - The follow-up is appended only after its required assets are prepared.
 
 ## Final result

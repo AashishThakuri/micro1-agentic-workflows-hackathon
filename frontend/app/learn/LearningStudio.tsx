@@ -782,6 +782,10 @@ export function LearningStudio() {
           2,
           Math.min(59, Number(payload.retryAfterSeconds) || (Number.isFinite(headerDelay) ? headerDelay : 7)),
         );
+        if (silent && retryAfter > 15) {
+          audioUnavailableRef.current.add(scene.id);
+          throw new Error(payload.error || "Narration is cooling down and will be prepared later.");
+        }
         if (!silent) setStatusMessage(`Gemini voice quota reached. Retrying this scene in ${retryAfter}s…`);
         await wait(retryAfter * 1000);
       }
@@ -1166,7 +1170,12 @@ export function LearningStudio() {
         renderSpec: revisionRenderSpec,
         revision: question,
       };
-      await getSceneAudioUrl(followUpCandidate);
+      let followUpHasAudio = true;
+      try {
+        await getSceneAudioUrl(followUpCandidate, true);
+      } catch {
+        followUpHasAudio = false;
+      }
       const followUpScene: Scene = {
         ...followUpCandidate,
         durationSeconds: Math.max(
@@ -1192,7 +1201,11 @@ export function LearningStudio() {
       activeSceneIndexRef.current = followUpIndex;
       setSceneProgress(0);
       setRefineState("done");
-      setStatusMessage("Your clearer explanation was added to the end of the lesson.");
+      setStatusMessage(
+        followUpHasAudio
+          ? "Your clearer explanation was added to the end of the lesson."
+          : "Your clearer explanation was added. Narration can be prepared when voice quota returns.",
+      );
       await startSceneAudio(followUpIndex);
     } catch {
       setComment(question);
